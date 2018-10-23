@@ -81,7 +81,7 @@ storageclass: efs
 legion_data_bucket_prefix: epm-legion-data
 legion_data_s3_bucket: "{{ legion_data_bucket_prefix }}-{{ env_type }}-{{ enclave }}"
 airflow_dags_dir: '/airflow-dags'
-airflow_executor: KubernetesExecutor
+airflow_executor: Executors.KubernetesExecutor
 airflow_dags_pvc: legion-airflow-dags
 airflow_s3_logs_path: 'airflow-logs/'
 airflow_s3_logs_url: "s3://{{ legion_data_s3_bucket }}/{{ airflow_s3_logs_path }}"
