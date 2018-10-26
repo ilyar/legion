@@ -71,6 +71,15 @@ class TestEDI(unittest2.TestCase):
                 self.assertIsInstance(models_info, list)
                 self.assertEqual(len(models_info), 0)
 
+    def test_edi_deploy_one_model(self):
+        with EDITestServer('company-a') as edi:
+            # with p_func('kubernetes.client.CoreV1Api.list_namespaced_service', 'two_models'), \
+            #      p_func('kubernetes.client.ExtensionsV1beta1Api.list_namespaced_deployment', 'two_models'):
+                deployments = edi.edi_client.deploy('nexus-lo.cc.mldev.ada.iqvia.com:443/legion/test-bare-model-api-model-3:0.9.0-20181023080524.488.42a945c')
+                # Test count of returned models
+                self.assertIsInstance(deployments, list)
+                self.assertEqual(len(deployments), 1)
+
 
 if __name__ == '__main__':
     unittest2.main()
