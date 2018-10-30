@@ -348,9 +348,9 @@ def get_application_grafana(application):
     :type application: :py:class:`Flask.app`
     :return :py:class:`legion.external.grafana.GrafanaClient`
     """
-    grafana_client = legion.external.grafana.GrafanaClient(application.config['ENCLAVE'].grafana_service.url,
-                                                           application.config['CLUSTER_SECRETS']['grafana.user'],
-                                                           application.config['CLUSTER_SECRETS']['grafana.password'])
+    grafana_client = legion.external.grafana.GrafanaClient("grafana-company-a.beta.mldev.ada.iqvia.com",
+                                                           "admin",
+                                                           "admin")
     return grafana_client
 
 
