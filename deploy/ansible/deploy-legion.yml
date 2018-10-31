@@ -37,7 +37,7 @@
   
   roles:
     - charts_common
-    - legion_core_chart
+ #   - legion_core_chart
 
   tasks:
     - include_role:
