@@ -23,28 +23,19 @@ data:
         schedule_interval='@once',
         dagrun_timeout=datetime.timedelta(minutes=2))
 
-    #def output_some_data():
-    #    print('Output data')
-#
-    #output_data = PythonOperator(task_id='output_some_data',
-    #                             python_callable=output_some_data,
-    #                             dag=dag,
-    #                             executor_config={
-    #                                 "KubernetesExecutor": {"image": "{{ .Values.image }}"}}
-    #)
-
     echo_1 = BashOperator(task_id='echo_1',
-                               bash_command='env',
-                               dag=dag,
-                               executor_config={
-                                   "KubernetesExecutor": {"image": "{{ .Values.image }}"}}
+                          bash_command='env',
+                          dag=dag,
+                          executor_config={
+                          "KubernetesExecutor": {"image": "{{ .Values.image }}"}}
     )
     echo_2 = BashOperator(task_id='echo_2',
-                               bash_command='ls -lsa',
-                               dag=dag,
-                               executor_config={
-                                   "KubernetesExecutor": {"image": "{{ .Values.image }}"}}
+                          bash_command='ls -lsa',
+                          dag=dag,
+                          executor_config={
+                          "KubernetesExecutor": {"image": "{{ .Values.image }}"}}
     )
+<<<<<<< b5018897c7680bab2d0e3936b0f7897f54e634ec
 
     echo_1 >> output_data
     echo_2 >> output_data
@@ -134,7 +125,7 @@ data:
                               )
 
     passing.set_upstream(start)
-=======
+
 #  s3-connection-test.py: |-
 #    """DAG for S3 connection testing."""
 #    from datetime import datetime
@@ -175,4 +166,4 @@ data:
 #        executor_config={
 #            "KubernetesExecutor": {"image": "{{ .Values.image }}"}}
 #    )
->>>>>>> [#347] update dags
+
