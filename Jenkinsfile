@@ -154,27 +154,13 @@ pipeline {
 
                         sh '''
                         cd legion_airflow
-                        pycodestyle --show-source --show-pep8 legion_airflow
-                        pycodestyle --show-source --show-pep8 tests
-                        pydocstyle legion_airflow
+                        pycodestyle legion_airflow --ignore E402,E126,W503,E731,W391
+                        pycodestyle tests
 
                         TERM="linux" pylint --persistent=n legion_airflow > legion_airflow-pylint.log || exit 0
                         TERM="linux" pylint --persistent=n tests >> legion_airflow-pylint.log || exit 0
                         cd ..
                         '''
-
-                        archiveArtifacts 'legion_airflow/legion_airflow-pylint.log'
-                        warnings canComputeNew: false, canResolveRelativePaths: false, categoriesPattern: '', defaultEncoding: '',  excludePattern: '', healthy: '', includePattern: '', messagesPattern: '', parserConfigurations: [[   parserName: 'PyLint', pattern: 'legion_airflow/legion_airflow-pylint.log']], unHealthy: ''
-
-                        sh '''
-                        cd legion_test
-
-                        TERM="linux" pylint --persistent=n legion_test > legion_test-pylint.log || exit 0
-                        cd ..
-                        '''
-
-                        archiveArtifacts 'legion_test/legion_test-pylint.log'
-                        warnings canComputeNew: false, canResolveRelativePaths: false, categoriesPattern: '', defaultEncoding: '',  excludePattern: '', healthy: '', includePattern: '', messagesPattern: '', parserConfigurations: [[   parserName: 'PyLint', pattern: 'legion_test/legion_test-pylint.log']], unHealthy: ''
                     }
                 }
                 stage("Upload Legion package") {
