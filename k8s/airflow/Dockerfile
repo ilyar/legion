@@ -14,7 +14,7 @@
 #   limitations under the License.
 
 ARG version=latest
-FROM legion/base-pythimageon-:${version}
+FROM legion/base-python-image:${version}
 
 ENV AIRFLOW_HOME /home/airflow
 ENV AIRFLOW_GPL_UNIDECODE=yes
