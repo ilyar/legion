@@ -31,7 +31,8 @@ RUN service cron stop \
     && useradd -ms /bin/bash -d ${AIRFLOW_HOME} airflow
 
 RUN pip3 install --disable-pip-version-check cryptography==2.4.1 \
-    && pip3 install --disable-pip-version-check apache-airflow[postgres,jdbc,password,mysql,celery,redis,s3]==1.10.0 \
+#    && pip3 install --disable-pip-version-check apache-airflow[postgres,jdbc,password,mysql,celery,redis,s3]==1.10.0 \
+    && pip3 install git+https://github.com/apache/incubator-airflow.git@2d517e1abce3f70b573da7ee0202fc11d903557b \
     pyOpenSSL==18.0.0 ndg-httpsclient==0.5.1 pyasn1==0.4.4 psycopg2-binary==2.7.6.1 redis==2.10.6 hiredis==0.2.0 \
     requests==2.18.4
 
