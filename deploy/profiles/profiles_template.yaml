@@ -68,6 +68,7 @@ legion_data_s3_bucket: ~ # s3 bucket for enclave data
 
 # Airflow specific configuration
 airflow_dags_dir: ~                                        # Name of Aitflow DAGs directory
+airflow_executor: ~         # airflow executor name
 airflow_dags_pvc: ~                                    # Name of Airflow DAGs PVC which will be created in Cluster
 airflow_s3_logs_path: ~                           # Path at S3 for airflow log
 airflow_s3_logs_url: ~                             # S3 url for storing Airflow logs, it should contain bucket name and key. E.g.: airflow_s3_logs_url: "s3://{{ legion_data_s3_bucket }}/{{ airflow_s3_logs_path }}"

@@ -155,7 +155,7 @@ pipeline {
                         sh '''
                         cd legion_airflow
                         pycodestyle legion_airflow --ignore E402,E126,W503,E731,W391
-                        pycodestyle tests
+                        pycodestyle legion_airflow
 
                         TERM="linux" pylint --persistent=n legion_airflow > legion_airflow-pylint.log || exit 0
                         TERM="linux" pylint --persistent=n tests >> legion_airflow-pylint.log || exit 0
