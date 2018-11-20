@@ -139,6 +139,7 @@ filter_by_owner = {{ .Values.webserver.filter_by_owner }}
 airflow_configmap ={{ .Release.Name }}-worker-config
 #worker_container_repository = airflow
 #worker_container_tag = latest
+worker_service_account_name = {{ .Release.Name }}-worker
 worker_container_image_pull_policy = IfNotPresent
 delete_worker_pods = False
 #git_repo = https://github.com/apache/incubator-airflow.git
