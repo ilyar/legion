@@ -4,11 +4,13 @@
   register: whoami_output
 
 - include: check_current_certificates.yaml
+  when: acm_type is not defined
 
 - include: create_certificate.yaml
-  when: valid_certificate_not_exists
+  when: valid_certificate_not_exists and acm_type is not defined
 
 - include: challenge.yaml
-  when: valid_certificate_not_exists
+  when: valid_certificate_not_exists and acm_type is not defined
 
 - include: install.yaml
+  when: acm_type is not defined

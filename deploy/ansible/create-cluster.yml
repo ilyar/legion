@@ -21,6 +21,18 @@
         dest: "{{ secrets_file }}"
         mode: get
 
+    - name: "Gather AWS ACM facts in {{ aws_region }}"
+      aws_acm_facts:
+        region: "{{ aws_region }}"
+        statuses:
+        - ISSUED
+      register: acm_check
+
+    - name: Set facts for the AWS ACM
+      set_fact:
+          acm_type: "{{ acm_check.certificates[0].type }}"
+          acm_cert: "{{ acm_check.certificates[0].certificate_arn }}"
+
     - name: Validate profile yaml-file
       validator:
         source: "{{ lookup('env', 'PROFILES_PATH') or '../profiles' }}/{{ profile }}.yml"
@@ -40,7 +52,6 @@
       file:
         name: "{{ secrets_file }}"
         state: absent
-
 
   roles:
     - k8s_create_cluster
