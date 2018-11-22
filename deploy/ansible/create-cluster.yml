@@ -30,6 +30,7 @@
 
     - name: Set facts for the AWS ACM
       set_fact:
+          acm_type: "{{ acm_check.certificates[0].type }}"
           acm_cert: "{{ acm_check.certificates[0].certificate_arn }}"
 
     - name: Validate profile yaml-file
