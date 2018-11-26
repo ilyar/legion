@@ -16,9 +16,8 @@ metadata:
     service.beta.kubernetes.io/aws-load-balancer-extra-security-groups: "{{ external_access_sgs|join(',') }}"
     # Attach ACM certificates to Load balancer
     service.beta.kubernetes.io/aws-load-balancer-ssl-cert: "{{ acm_cert }}"
-    # service.beta.kubernetes.io/aws-load-balancer-backend-protocol: https
-    # service.beta.kubernetes.io/aws-load-balancer-ssl-ports: https
-    service.beta.kubernetes.io/aws-load-balancer-internal: 0.0.0.0/0
+    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: http
+    service.beta.kubernetes.io/aws-load-balancer-ssl-ports: https
 
 spec:
   type: LoadBalancer
@@ -44,5 +43,4 @@ metadata:
   labels:
     app: ingress-nginx
 data:
-  proxy-body-size: 100m
   use-proxy-protocol: "true"
