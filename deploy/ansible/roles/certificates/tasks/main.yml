@@ -6,10 +6,10 @@
 - include: check_current_certificates.yaml
 
 - include: create_certificate.yaml
-  when: valid_certificate_not_exists #and acm_type is not defined
+  when: valid_certificate_not_exists and acm_type is not defined
 
 - include: challenge.yaml
-  when: valid_certificate_not_exists #and acm_type is not defined
+  when: valid_certificate_not_exists and acm_type is not defined
 
 - include: install.yaml
-  #when: acm_type is not defined
+  when: acm_type is not defined

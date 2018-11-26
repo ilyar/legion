@@ -152,6 +152,7 @@ spec:
             - name: AWS_REGION
               value: {{ aws_region }}
           imagePullPolicy: "Always"
+{% if acm_cert is not defined %}
           volumeMounts:
             - name: ssl-certs
               mountPath: /etc/ssl/certs/ca-certificates.crt
@@ -160,3 +161,4 @@ spec:
         - name: ssl-certs
           hostPath:
             path: "/etc/ssl/certs/ca-certificates.crt"
+{% endif %}
