@@ -42,12 +42,6 @@ data:
                           executor_config=executor_config
     )
 
-    echo_1 >> output_data
-    echo_2 >> output_data
-
-    if __name__ == "__main__":
-        dag.cli()
-
 #  s3-connection-test.py: |-
 #    """DAG for S3 connection testing."""
 #    from datetime import datetime
