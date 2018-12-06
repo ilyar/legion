@@ -80,6 +80,12 @@ http{
       return 200;
     }
 
+    location = /api/model/([a-zA-Z0-9\-\.]+)/([a-zA-Z0-9\-\.]+)/feedback {
+        rewrite /(.*) / break;
+
+        proxy_pass {{ environ['FEEDBACK_BACKEND'] }};
+    }
+
     # Models API
     {% for model_endpoint in models %}
     location /api/model/{{ model_endpoint.url }} {

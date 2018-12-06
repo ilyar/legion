@@ -8,7 +8,7 @@ metadata:
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     component: "{{ .Release.Name }}-fluentd"
 spec:
-  replicas: {{ .Values.replicas }}
+  replicas: {{ .Values.feedback.replicas }}
   selector:
     matchLabels:
       component: "{{ .Release.Name }}-fluentd"
@@ -21,8 +21,8 @@ spec:
     spec:
       containers:
       - name: fluentd
-        image: "{{ .Values.image }}"
-        PullPolicy: "{{ .Values.pullPolicy }}"
+        image: "{{ .Values.feedback.image.repository }}:{{ .Values.feedback.image.tag }}"
+        PullPolicy: "{{ .Values.feedback.image.pullPolicy }}"
         resources:
           requests:
             cpu: "300m"
@@ -56,35 +56,3 @@ spec:
     port: 80
     targetPort: 80
     protocol: TCP
----
-apiVersion: extensions/v1beta1
-kind: Ingress
-metadata:
-  annotations:
-  {{- range $key, $value := .Values.ingress.annotations }}
-    {{ $key }}: {{ $value | quote }}
-  {{- end }}
-  labels:
-    heritage: {{ .Release.Service | quote }}
-    release: {{ .Release.Name | quote }}
-    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-    component: "{{ .Release.Name }}-fluentd"
-  name: "{{ .Release.Name }}-fluentd"
-spec:
-  rules:
-    - host: "{{ .Values.ingress.domain.partial }}{{ .Values.domainDelimiter }}{{ .Values.rootDomain }}"
-      http:
-        paths:
-          - backend:
-              serviceName: "{{ .Release.Name }}-fluentd"
-              servicePort: 80
-  {{- if .Values.ingress.tls.enabled }}
-  tls:
-  - hosts:
-    - "{{ .Values.ingress.domain.partial }}{{ .Values.domainDelimiter }}{{ .Values.rootDomain }}"
-    {{- if .Values.ingress.tls.autoSecretNameDeduction }}
-    secretName: "{{ .Values.rootDomain }}-tls"
-    {{- else }}
-    secretName: {{ .Values.ingress.tls.secretName  }}
-    {{- end }}
-  {{- end }}
