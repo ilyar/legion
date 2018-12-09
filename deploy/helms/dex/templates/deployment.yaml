@@ -47,7 +47,7 @@ spec:
             subPath: config.yaml
             name: dex-config
             readOnly: true
-{{- if .Values.ingress.enabled }}{{- else }}
+{{- if .Values.tls.secret_mode }}
           - mountPath: /tls
             name: dex-tls
 {{- end }}
