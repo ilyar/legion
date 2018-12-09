@@ -9,10 +9,7 @@ connectors:
 connectors: []
 {% endif %}
 
-{% if valid_certificate_not_exists %}
-tls:
-  secret_mode: true
-{% else %}
+{% if acm_type is defined %}
 tls:
   secret_mode: false
 
@@ -21,6 +18,9 @@ service:
     service.beta.kubernetes.io/aws-load-balancer-ssl-cert: "{{ acm_cert }}"
     service.beta.kubernetes.io/aws-load-balancer-backend-protocol: http
     service.beta.kubernetes.io/aws-load-balancer-ssl-ports: https
+{% else %}
+tls:
+  secret_mode: true
 {% endif %}
 
 staticClients:
