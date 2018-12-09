@@ -15,9 +15,11 @@ metadata:
     service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: '3600'
     service.beta.kubernetes.io/aws-load-balancer-extra-security-groups: "{{ external_access_sgs|join(',') }}"
     # Attach ACM certificates to Load balancer
+{% if valid_certificate_not_exists == false %}
     service.beta.kubernetes.io/aws-load-balancer-ssl-cert: "{{ acm_cert }}"
     service.beta.kubernetes.io/aws-load-balancer-backend-protocol: http
     service.beta.kubernetes.io/aws-load-balancer-ssl-ports: https
+{% endif %}
 
 spec:
   type: LoadBalancer
