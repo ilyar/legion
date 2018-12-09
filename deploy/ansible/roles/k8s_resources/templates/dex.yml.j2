@@ -9,7 +9,7 @@ connectors:
 connectors: []
 {% endif %}
 
-{% if valid_certificate_not_exists == false %}
+{% if valid_certificate_not_exists %}{% else %}
 tls:
   secret_mode: false
 
