@@ -21,7 +21,7 @@ service:
 {% else %}
 tls:
   secret-mode: true
-{% enfif %}
+{% endif %}
 
 staticClients:
 - id: {{ dex.config.client_id }}
