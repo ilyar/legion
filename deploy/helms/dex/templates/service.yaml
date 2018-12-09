@@ -17,6 +17,11 @@ spec:
     - port: {{ .Values.service.port }}
       targetPort: {{ .Values.service.targetPort }}
       protocol: TCP
+{{- if .Values.tls.secret_mode }}{{- else }}
+    - port: 80
+      targetPort: {{ .Values.service.targetPort }}
+      protocol: TCP
+{{- end }}
   selector:
     app: {{ template "dex.name" . }}
     release: {{ .Release.Name }}
