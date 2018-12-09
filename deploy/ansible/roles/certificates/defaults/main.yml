@@ -1,4 +1,5 @@
 ---
+use_aws_acm: false
 ler53_check_delta_days: "10"
 ler53_acme_url: "https://acme-v02.api.letsencrypt.org/directory"
 ler52_acme_certificate_check: yes

@@ -1,4 +1,18 @@
 ---
+- name: "Gather AWS ACM facts in {{ aws_region }}"
+  aws_acm_facts:
+    region: "{{ aws_region }}"
+    statuses:
+    - ISSUED
+  register: acm_check
+  when: use_aws_acm
+
+- name: Set facts for the AWS ACM
+  set_fact:
+      acm_type: "{{ acm_check.certificates[0].type }}"
+      acm_cert: "{{ acm_check.certificates[0].certificate_arn }}"
+  when: use_aws_acm
+
 - name: get the username
   local_action: command whoami
   register: whoami_output
