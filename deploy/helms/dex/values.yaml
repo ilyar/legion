@@ -63,7 +63,7 @@ service:
 
 tls_secret: chart-example-tls
 tls:
-  secret-mode: false
+  secret_mode: false
 
 ingress:
   enabled: false

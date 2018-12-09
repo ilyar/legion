@@ -23,7 +23,7 @@ spec:
       - name: dex-config
         secret:
           secretName: {{ template "dex.fullname" . }}
-{{- if .Values.tls.secret-mode }}
+{{- if .Values.tls.secret_mode }}
       - name: dex-tls
         secret:
           secretName: {{ .Values.tls_secret }}

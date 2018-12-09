@@ -11,7 +11,7 @@ connectors: []
 
 {% if valid_certificate_not_exists == false %}
 tls:
-  secret-mode: false
+  secret_mode: false
 
 service:
   annotations:
@@ -20,7 +20,7 @@ service:
     service.beta.kubernetes.io/aws-load-balancer-ssl-ports: https
 {% else %}
 tls:
-  secret-mode: true
+  secret_mode: true
 {% endif %}
 
 staticClients:
