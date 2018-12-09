@@ -9,6 +9,20 @@ connectors:
 connectors: []
 {% endif %}
 
+{% if valid_certificate_not_exists == false %}
+tls:
+  secret-mode: false
+
+service:
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-ssl-cert: "{{ acm_cert }}"
+    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: http
+    service.beta.kubernetes.io/aws-load-balancer-ssl-ports: https
+{% else %}
+tls:
+  secret-mode: true
+{% enfif %}
+
 staticClients:
 - id: {{ dex.config.client_id }}
   secret: {{ dex.config.client_secret }}

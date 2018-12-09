@@ -55,12 +55,15 @@ skipApprovalScreen: true
 enablePasswordDB: true
 
 service:
+  annotations: {}
   type: LoadBalancer
   port: 443
   targetPort: 5556
   name: dex
 
 tls_secret: chart-example-tls
+tls:
+  secret-mode: false
 
 ingress:
   enabled: false
