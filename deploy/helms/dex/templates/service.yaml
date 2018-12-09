@@ -15,10 +15,12 @@ spec:
   type: {{ .Values.service.type }}
   ports:
     - port: {{ .Values.service.port }}
+      name: https
       targetPort: {{ .Values.service.targetPort }}
       protocol: TCP
 {{- if .Values.tls.secret_mode }}{{- else }}
     - port: 80
+      name: http
       targetPort: {{ .Values.service.targetPort }}
       protocol: TCP
 {{- end }}
