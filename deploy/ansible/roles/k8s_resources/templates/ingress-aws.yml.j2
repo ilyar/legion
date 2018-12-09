@@ -17,7 +17,7 @@ metadata:
     # Attach ACM certificates to Load balancer
 {% if acm_type is defined %}
     service.beta.kubernetes.io/aws-load-balancer-ssl-cert: "{{ acm_cert }}"
-    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: http
+    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: tcp
     service.beta.kubernetes.io/aws-load-balancer-ssl-ports: https
 {% endif %}
 
@@ -33,7 +33,11 @@ spec:
     targetPort: http
   - name: https
     port: 443
+{% if acm_type is defined %}
+    targetPort: http
+{% else %}
     targetPort: 443
+{% end %}
 
 ---
 
