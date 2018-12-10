@@ -36,6 +36,7 @@
         state: absent
   
   roles:
+    - certificates
     - charts_common
     - legion_core_chart
 

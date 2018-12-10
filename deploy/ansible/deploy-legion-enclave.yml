@@ -37,6 +37,9 @@
         state: absent
 
   tasks:
+  - name: Check TLS Certificates
+    include_role:
+      name: certificates
   - name: Install charts common dependencies
     include_role:
       name: charts_common
