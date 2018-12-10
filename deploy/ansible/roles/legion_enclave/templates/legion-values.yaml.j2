@@ -20,6 +20,7 @@ grafana:
   ingress:
     tls:
       enabled: {% if (use_https == "yes") and (acm_type is not defined) %}true{% else %}false{% endif %}
+
 {% if dex.enabled == true %}
 
     annotations:
