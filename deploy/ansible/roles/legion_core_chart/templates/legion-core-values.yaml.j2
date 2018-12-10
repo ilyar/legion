@@ -34,7 +34,7 @@ jenkins:
 
   ingress:
     tls:
-      enabled: {% if use_https == "yes" %}true{% else %}false{% endif %}
+      enabled: {% if (use_https == "yes") and (acm_type is not defined) %}true{% else %}false{% endif %}
 
   airflow:
     enabled: true
@@ -81,11 +81,11 @@ grafana:
 
   ingress:
     tls:
-      enabled: {% if use_https == "yes" %}true{% else %}false{% endif %}
+      enabled: {% if (use_https == "yes") and (acm_type is not defined) %}true{% else %}false{% endif %}
 
 nexus:
   enabled: true
 
   ingress:
     tls:
-      enabled: {% if use_https == "yes" %}true{% else %}false{% endif %}
+      enabled: {% if (use_https == "yes") and (acm_type is not defined) %}true{% else %}false{% endif %}

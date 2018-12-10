@@ -25,7 +25,9 @@ spec:
       - backend:
           serviceName: kubernetes-dashboard
           servicePort: {{ (dashboard.insecure == true) | ternary(80, 443) }}
+{% if acm_type is not defined %}
   tls:
   - hosts:
     - dashboard.{{ cluster_name }}
     secretName: {{ cluster_name }}-tls
+{% endif %}

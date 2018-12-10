@@ -20,10 +20,12 @@ ingress:
   path: /
   hosts:
   - auth.{{ cluster_name }}
+{% if acm_type is not defined %}
   tls:
   - secretName: {{ cluster_name }}-tls
     hosts:
     - auth.{{ cluster_name }}
+{% endif %}
 
 resources:
   limits:

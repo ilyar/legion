@@ -39,10 +39,10 @@ ingress:
   path: /
   hosts:
     - auth.chart-example.local
-  tls:
-  - secretName: chart-example-tls
-    hosts:
-    - auth.chart-example.local
+  # tls:
+  # - secretName: chart-example-tls
+  #   hosts:
+  #   - auth.chart-example.local
 
 resources:
   # limits:

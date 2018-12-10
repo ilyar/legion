@@ -19,10 +19,12 @@ ingress:
   enabled: true
   hosts:
     - auth.{{ cluster_name }}
+{% if acm_type is not defined %}
   tls:
   - secretName: {{ cluster_name }}-tls
     hosts:
     - auth.{{ cluster_name }}
+{% endif %}
 
 image:
   repository: {{ legion_infra_registry }}/k8s-oauth2-proxy

@@ -82,7 +82,7 @@ ingress:
   enabled: true
   url_suffix: {{ enclave }}
   tls:
-    enabled: true
+    enabled: {% if (use_https == "yes") and (acm_type is not defined) %}true{% else %}false{% endif %}
 {% if dex.enabled == true %}
   annotations:
     nginx.ingress.kubernetes.io/auth-signin: https://auth.{{ cluster_name }}/oauth2/start?rd=https://$host$request_uri$is_args$args

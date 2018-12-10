@@ -19,7 +19,7 @@ grafana:
 
   ingress:
     tls:
-      enabled: {% if use_https == "yes" %}true{% else %}false{% endif %}
+      enabled: {% if (use_https == "yes") and (acm_type is not defined) %}true{% else %}false{% endif %}
 {% if dex.enabled == true %}
 
     annotations:
@@ -38,7 +38,7 @@ edge:
 
   ingress:
     tls:
-      enabled: {% if use_https == "yes" %}true{% else %}false{% endif %}
+      enabled: {% if (use_https == "yes") and (acm_type is not defined) %}true{% else %}false{% endif %}
 
 edi:
   enabled: true
@@ -49,7 +49,7 @@ edi:
 
   ingress:
     tls:
-      enabled: {% if use_https == "yes" %}true{% else %}false{% endif %}
+      enabled: {% if (use_https == "yes") and (acm_type is not defined) %}true{% else %}false{% endif %}
 
 secrets:
   token_secret: "{{ api.jwt_secret }}"
