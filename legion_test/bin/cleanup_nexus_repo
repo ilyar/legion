@@ -33,8 +33,8 @@ Options = NamedTuple('Options', [
     ('build_name', str)
 ])
 
-NEXUS_SEARCH_URL = '{host}/service/siesta/rest/beta/search'
-NEXUS_DELETE_URL = '{host}/service/siesta/rest/beta/components/{resource}'
+NEXUS_SEARCH_URL = '{host}/service/rest/v1/search'
+NEXUS_DELETE_URL = '{host}/service/rest/v1/components/{resource}'
 
 
 def get_builds(nexus_url, repository, user, password, build_name):
