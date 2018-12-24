@@ -45,7 +45,7 @@ RUN pip3 install --disable-pip-version-check --upgrade pip==9.0.3 pipenv==2018.1
 COPY Pipfile Pipfile
 COPY Pipfile.lock Pipfile.lock
 
-RUN pipenv install --system --deploy --python python3.6
+RUN pipenv install -v --system --deploy --python python3.6
 
 # Install Legion
 ARG pip_extra_index_params=""
@@ -55,7 +55,7 @@ RUN python3 -m pip install $pip_extra_index_params legion$pip_legion_version_str
 
 WORKDIR /
 
-#RUN python3 -m compileall /usr/lib/python3.6/site-packages
+RUN python3 -m compileall /usr/lib/python3.6/site-packages
 
 # Staff
 ADD start.sh /start.sh
