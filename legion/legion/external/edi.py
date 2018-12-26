@@ -291,7 +291,7 @@ def add_arguments_for_wait_operation(parser):
     parser.add_argument('--no-wait',
                         action='store_true', help='no wait until scale will be finished')
     parser.add_argument('--timeout',
-                        default=300,
+                        default=300000,
                         type=int, help='timeout in s. for wait (if no-wait is off)')
 
 
