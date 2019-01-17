@@ -15,3 +15,22 @@
 - name: Install Prometheus
   command: "helm --kube-context {{ cluster_name }} install --version {{ kube_prometheus }} coreos/kube-prometheus --name kube-prometheus --namespace kube-system -f {{ tmp_dir }}/prometheus.{{ cluster_name }}.yml"
   ignore_errors: true
+
+- name: Create Prometheus Pushgateway configuration (values) file
+  template:
+    src: pushgateway-values.yaml.j2
+    dest: "{{ tmp_dir }}/pushgateway.{{ cluster_name }}.yaml"
+    mode: 0644
+
+- name: Install Prometheus Pushgateway
+  command: "helm --kube-context {{ cluster_name }} install stable/prometheus-pushgateway --name prometheus-pushgateway --namespace kube-system -f {{ tmp_dir }}/pushgateway.{{ cluster_name }}.yaml"
+  ignore_errors: true
+
+- name: Create Prometheus Pushgateway ServiceMonitor config
+  template:
+    src: pushgateway-sm.yaml
+    dest: "{{ tmp_dir }}/pushgateway-sm.{{ cluster_name }}.yaml"
+    mode: 0644
+
+- name: Apply Pushgateway ServiceMonitor
+  command: "kubectl --context {{ cluster_name }} apply -f {{ tmp_dir }}/pushgateway-sm.{{ cluster_name }}.yaml"

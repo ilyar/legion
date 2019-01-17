@@ -3,3 +3,4 @@
 prometheus_operator: 0.0.15
 kube_prometheus: 0.0.43
 helm_local_src: false
+prometheus_pushgateway: 0.6.0
