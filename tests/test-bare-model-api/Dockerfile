@@ -15,6 +15,8 @@
 #
 FROM python:3.6-alpine3.7@sha256:386ecd80510e1ebecbca17b2efa74f3029fa7dce882b5132cf6ee3bd17cf108a
 
+RUN apk add --update tcpdump
+
 COPY . /app
 WORKDIR /app
 
@@ -27,5 +29,5 @@ LABEL com.epam.legion.model.id="$model_id" \
       com.epam.legion.model.version="$model_version" \
       com.epam.legion.container_type="model"
 
-ENTRYPOINT ["python"]
-CMD ["app.py"]
+ENTRYPOINT ["sh"]
+CMD ["start.sh"]
