@@ -325,7 +325,7 @@ class Enclave:
         )
 
         livenessprobe = kubernetes.client.V1Probe(
-            failure_threshold=50,
+            failure_threshold=5000,
             http_get=http_get_object,
             initial_delay_seconds=livenesstimeout,
             period_seconds=10,
@@ -333,7 +333,7 @@ class Enclave:
         )
 
         readinessprobe = kubernetes.client.V1Probe(
-            failure_threshold=50,
+            failure_threshold=5000,
             http_get=http_get_object,
             initial_delay_seconds=readinesstimeout,
             period_seconds=10,
