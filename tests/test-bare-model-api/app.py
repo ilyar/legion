@@ -15,20 +15,20 @@
 #
 from flask import Flask, jsonify, request
 
-app = Flask(__name__)
+application = Flask(__name__)
 
 
-@app.route('/')
+@application.route('/')
 def root():
     return jsonify(demo=True)
 
 
-@app.route('/healthcheck')
+@application.route('/healthcheck')
 def healthcheck():
     return jsonify(demo=True)
 
 
-@app.route('/api/model/<model>/<version>/info', methods=['GET', 'POST'])
+@application.route('/api/model/<model>/<version>/info', methods=['GET', 'POST'])
 def model_info(model, version):
     return jsonify(
         model_version=version,
@@ -45,8 +45,8 @@ def model_info(model, version):
     )
 
 
-@app.route('/api/model/<model>/<version>/invoke', methods=['GET', 'POST'])
-@app.route('/api/model/<model>/<version>/invoke/<endpoint>', methods=['GET', 'POST'])
+@application.route('/api/model/<model>/<version>/invoke', methods=['GET', 'POST'])
+@application.route('/api/model/<model>/<version>/invoke/<endpoint>', methods=['GET', 'POST'])
 def model_invoke(model, version, endpoint=None):
     arguments = request.form
     result = 42.0
@@ -58,4 +58,4 @@ def model_invoke(model, version, endpoint=None):
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+    application.run(host='0.0.0.0')

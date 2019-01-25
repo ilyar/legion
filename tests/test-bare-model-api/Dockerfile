@@ -15,12 +15,14 @@
 #
 FROM python:3.6-alpine3.7@sha256:386ecd80510e1ebecbca17b2efa74f3029fa7dce882b5132cf6ee3bd17cf108a
 
-RUN apk add --update tcpdump
+RUN apk add --update tcpdump curl gcc libc-dev linux-headers && mkdir /app
 
-COPY . /app
 WORKDIR /app
 
+COPY requirements.txt ./
 RUN pip install -r requirements.txt
+
+COPY . /app
 
 ARG model_id="demo-abc-model"
 ARG model_version="1.0"
