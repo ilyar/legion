@@ -267,6 +267,7 @@ EOL
 """
                             }
                             sh """
+                            ls -al /src/legion/dist
                             twine upload -r ${env.param_local_pypi_distribution_target_name} '/src/legion/dist/legion-${Globals.buildVersion}.*'
                             twine upload -r ${env.param_local_pypi_distribution_target_name} '/src/legion_test/dist/legion_test-${Globals.buildVersion}.*'
                             twine upload -r ${env.param_local_pypi_distribution_target_name} '/src/legion_airflow/dist/legion_airflow-${Globals.buildVersion}.*'
