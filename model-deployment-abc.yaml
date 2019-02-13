@@ -1,0 +1,7 @@
+apiVersion: legion-platform.org/v1
+kind: ModelDeployment
+metadata:
+  name: deploy-a
+spec:
+  image: localhost:31111/legion_model/recognize-digits:1.0-190213075345.1.e8c9e6c
+  replicas: 3

@@ -1,0 +1,23 @@
+---
+
+####################
+# Install Metacontroller
+####################
+
+- name: Check Metacontroller installation
+  shell: kubectl --context {{ cluster_name }} -n metacontroller crd compositecontrollers.metacontroller.k8s.io
+  register: kubernetes_metacontroller_status
+  ignore_errors: true
+
+- name: Delete metacontroller
+  shell: |
+    kubectl --context {{ cluster_name }} delete -f https://raw.githubusercontent.com/GoogleCloudPlatform/metacontroller/master/manifests/metacontroller-rbac.yaml
+    kubectl --context {{ cluster_name }} delete -f https://raw.githubusercontent.com/GoogleCloudPlatform/metacontroller/master/manifests/metacontroller.yaml
+  ignore_errors: true
+  when: kubernetes_metacontroller_status.rc == 0
+
+- name: Install metacontroller service
+  shell: |
+    kubectl --context {{ cluster_name }} apply -f https://raw.githubusercontent.com/GoogleCloudPlatform/metacontroller/master/manifests/metacontroller-rbac.yaml
+    kubectl --context {{ cluster_name }} apply -f https://raw.githubusercontent.com/GoogleCloudPlatform/metacontroller/master/manifests/metacontroller.yaml
+

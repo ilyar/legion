@@ -1,0 +1,55 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: "{{ .Release.Name }}-model-controller"
+  namespace: "metacontroller"
+  labels:
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    component: "{{ .Release.Name }}-model-controller"
+spec:
+  replicas: 1
+  selector:
+    component: "{{ .Release.Name }}-model-controller"
+  template:
+    metadata:
+      labels:
+        component: "{{ .Release.Name }}-model-controller"
+    spec:
+      containers:
+      - name: controller
+        image: "nexus-local.cc.epm.kharlamov.biz:443/legion/controller:1"
+        resources:
+          requests:
+            cpu: "250m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+        env:
+        - name: GF_SECURITY_ADMIN_PASSWORD
+          value: "replace_me"
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: "{{ .Release.Name }}-model-controller"
+  namespace: "metacontroller"
+  labels:
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    component: "{{ .Release.Name }}-model-controller"
+spec:
+  selector:
+    component: "{{ .Release.Name }}-model-controller"
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80
+    protocol: TCP

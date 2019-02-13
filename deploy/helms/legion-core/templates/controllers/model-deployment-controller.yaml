@@ -1,0 +1,27 @@
+apiVersion: metacontroller.k8s.io/v1alpha1
+kind: CompositeController
+metadata:
+  name: model-deployment-controller
+spec:
+  parentResource:
+    apiVersion: legion-platform.org/v1
+    resource: model-deployments
+    revisionHistory:
+      fieldPaths:
+      - spec.image
+      - spec.replicas
+  childResources:
+  - apiVersion: extensions/v1beta1
+    resource: deployments
+  - apiVersion: extensions/v1beta1
+    resource: replicasets
+  - apiVersion: v1
+    resource: services
+  - apiVersion: v1
+    resource: pods
+  generateSelector: true
+  hooks:
+    sync:
+      webhook:
+        url: "http://{{ .Release.Name }}-model-controller/sync-model"
+        timeout: 10s
