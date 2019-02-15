@@ -51,8 +51,8 @@ pipeline {
             param_jenkins_plugins_repository = "${params.JenkinsPluginsRepository}"
             param_docker_registry = "${params.DockerRegistry}"
             param_docker_hub_registry = "${params.DockerHubRegistry}"
+            param_docs_repository_store = "${params.DocsRepositoryStore}"
             ///Job parameters
-            localDocumentationStorage = "/www/docs/"
             infraBuildWorkspace = "${WORKSPACE}/k8s/k8s-infra"
             sharedLibPath = "deploy/legionPipeline.groovy"
     }
@@ -105,7 +105,7 @@ pipeline {
                     rm -f $envFile
                     touch $envFile
                     echo "LEGION_VERSION=${Globals.buildVersion}" >> $envFile
-                    """
+                    """.stripIndent()
                     archiveArtifacts envFile
                     sh "rm -f $envFile"
                 }
@@ -133,7 +133,7 @@ pipeline {
                             fi
                             git tag ${env.param_release_version}
                             git push origin ${env.param_release_version}
-                            """
+                            """.stripIndent()
                         } else {
                             print("Skipping release git tag push")
                         }
@@ -174,7 +174,7 @@ pipeline {
                         mvn -f k8s/jenkins/legion-jenkins-plugin/pom.xml clean -Dmaven.repo.local=/tmp/.m2/repository
                         mvn -f k8s/jenkins/legion-jenkins-plugin/pom.xml versions:set -DnewVersion=${Globals.buildVersion} -Dmaven.repo.local=/tmp/.m2/repository
                         mvn -f k8s/jenkins/legion-jenkins-plugin/pom.xml install -Dmaven.repo.local=/tmp/.m2/repository
-                        """
+                        """.stripIndent()
                         archiveArtifacts 'k8s/jenkins/legion-jenkins-plugin/target/legion-jenkins-plugin.hpi'
 
                         withCredentials([[
@@ -186,14 +186,14 @@ pipeline {
                             curl -v -u $USERNAME:$PASSWORD \
                             --upload-file k8s/jenkins/legion-jenkins-plugin/target/legion-jenkins-plugin.hpi \
                             ${env.param_jenkins_plugins_repository_store}/${Globals.buildVersion}/legion-jenkins-plugin.hpi
-                            """
+                            """.stripIndent()
                             script {
                                 if (env.param_stable_release){
                                     sh """
                                     curl -v -u $USERNAME:$PASSWORD \
                                     --upload-file k8s/jenkins/legion-jenkins-plugin/target/legion-jenkins-plugin.hpi \
                                     ${env.param_jenkins_plugins_repository_store}/latest/legion-jenkins-plugin.hpi
-                                    """
+                                    """.stripIndent()
                                 }
                             }
                         }
@@ -236,23 +236,24 @@ pipeline {
                              credentialsId: 'nexus-local-repository',
                              usernameVariable: 'USERNAME',
                              passwordVariable: 'PASSWORD']]) {
-                                sh """cat > /tmp/.pypirc << EOL
-[distutils]
-index-servers =
-  ${env.param_local_pypi_distribution_target_name}
+                                sh """
+                                cat > /tmp/.pypirc << EOL
+                                [distutils]
+                                index-servers =
+                                ${env.param_local_pypi_distribution_target_name}
 
-[${env.param_local_pypi_distribution_target_name}]
-repository=${env.param_pypi_repository.split('/').dropRight(1).join('/')}/
-username=${env.USERNAME}
-password=${env.PASSWORD}
-EOL
-"""
+                                [${env.param_local_pypi_distribution_target_name}]
+                                repository=${env.param_pypi_repository.split('/').dropRight(1).join('/')}/
+                                username=${env.USERNAME}
+                                password=${env.PASSWORD}
+                                EOL
+                                """.stripIndent()
                             }
                             sh """
                             twine upload -r ${env.param_local_pypi_distribution_target_name} '/src/legion/dist/legion-*'
                             twine upload -r ${env.param_local_pypi_distribution_target_name} '/src/legion_test/dist/legion_test-*'
                             twine upload -r ${env.param_local_pypi_distribution_target_name} '/src/legion_airflow/dist/legion_airflow-*'
-                            """
+                            """.stripIndent()
 
                             if (env.param_stable_release) {
                                 stage('Upload Legion package to pypi.org'){
@@ -262,23 +263,24 @@ EOL
                                         credentialsId: 'pypi-repository',
                                         usernameVariable: 'USERNAME',
                                         passwordVariable: 'PASSWORD']]) {
-                                            sh """cat > /tmp/.pypirc << EOL
-[distutils]
-index-servers =
-  ${env.param_test_pypi_distribution_target_name}
-  ${env.param_public_pypi_distribution_target_name}
+                                            sh """
+                                            cat > /tmp/.pypirc << EOL
+                                            [distutils]
+                                            index-servers =
+                                            ${env.param_test_pypi_distribution_target_name}
+                                            ${env.param_public_pypi_distribution_target_name}
 
-[${env.param_test_pypi_distribution_target_name}]
-repository=https://test.pypi.org/legacy/
-username=${env.USERNAME}
-password=${env.PASSWORD}
+                                            [${env.param_test_pypi_distribution_target_name}]
+                                            repository=https://test.pypi.org/legacy/
+                                            username=${env.USERNAME}
+                                            password=${env.PASSWORD}
 
-[${env.param_public_pypi_distribution_target_name}]
-repository=https://upload.pypi.org/legacy/
-username=${env.USERNAME}
-password=${env.PASSWORD}
-EOL
-"""
+                                            [${env.param_public_pypi_distribution_target_name}]
+                                            repository=https://upload.pypi.org/legacy/
+                                            username=${env.USERNAME}
+                                            password=${env.PASSWORD}
+                                            EOL
+                                            """.stripIndent()
                                         }
                                         sh """
                                         twine upload -r ${env.param_pypi_distribution_target_name} '/src/legion/dist/legion-*'
@@ -297,7 +299,6 @@ EOL
             agent {
                 docker {
                     image "legion-docker-agent:${env.BUILD_NUMBER}"
-                    args "-v ${localDocumentationStorage}:${localDocumentationStorage}"
                 }
             }
             steps {
@@ -311,10 +312,30 @@ EOL
                     sed -i 's/\'1.0\'/\'${Globals.buildVersion}\'/' source/conf.py
                     make html
                     find build/html -type f -name '*.html' | xargs sed -i -r 's/href=\"(.*)\\.md\"/href=\"\\1.html\"/'
-                    cd ../../
-                    """
+                    """.stripIndent()
 
-                    sh "cd legion && cp -rf docs/build/html/ \"${localDocumentationStorage}/${Globals.buildVersion}/\""
+                    withCredentials([[
+                            $class: 'UsernamePasswordMultiBinding',
+                            credentialsId: 'nexus-local-repository',
+                            usernameVariable: 'USERNAME',
+                            passwordVariable: 'PASSWORD']]) {
+                        sh """
+                        cd legion/docs/build
+                        mv html documentation
+
+                        echo "Preparing to send:"
+                        find documentation -type file
+
+                        find documentation -type file | xargs -I{} curl -v -u $USERNAME:$PASSWORD \
+                        --upload-file "{}" "${env.param_docs_repository_store}/${Globals.buildVersion}/{}"
+                        """.stripIndent()
+                        script {
+                            if (env.param_stable_release){
+                                echo "Pushing to public repositories is not implemented yet"
+                            }
+                        }
+                    }
+
                 }
             }
         }
@@ -443,7 +464,7 @@ EOL
                     agent {
                         docker {
                             image "legion-docker-agent:${env.BUILD_NUMBER}"
-                            args "-v ${localDocumentationStorage}:${localDocumentationStorage} -v /var/run/docker.sock:/var/run/docker.sock -u root --net host"
+                            args "-v /var/run/docker.sock:/var/run/docker.sock -u root --net host"
                         }
                     }
                     steps {
@@ -468,8 +489,9 @@ EOL
                         junit 'legion/nosetests.xml'
 
                         sh """
-                        cp -rf /src/legion/cover \"${localDocumentationStorage}/${Globals.buildVersion}-cover\"
+                        echo "Sending of coverage reports temporary disabled"
                         """
+                        //cp -rf /src/legion/cover \"${localDocumentationStorage}/${Globals.buildVersion}-cover\"
                     }
                 }
                 stage('Package helm charts'){
