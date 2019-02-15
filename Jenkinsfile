@@ -322,9 +322,9 @@ EOL
                         mv html documentation
 
                         echo "Preparing to send:"
-                        find documentation -type file
+                        find documentation -type f
 
-                        find documentation -type file | xargs -I{} curl -v -u $USERNAME:$PASSWORD \
+                        find documentation -type f | xargs -I{} curl -v -u $USERNAME:$PASSWORD \
                         --upload-file "{}" "${env.param_docs_repository_store}/${Globals.buildVersion}/{}"
                         """.stripIndent()
                         script {
