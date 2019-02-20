@@ -44,3 +44,6 @@
 
   roles:
     - certificates
+
+  environment:
+    PATH: "{{ lookup('env','HOME') }}/bin:{{ lookup('env','PATH') }}"

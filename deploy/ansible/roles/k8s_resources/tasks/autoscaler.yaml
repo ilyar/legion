@@ -9,7 +9,6 @@
     src: autoscaler.yaml.j2
     dest: "{{ tmp_dir }}/autoscaler.{{ cluster_name }}.yaml"
     mode: 0644
-  become: false
 
 - name: Launch Cluster Autoscaler
   command: "kubectl --context {{ cluster_name }} apply -f {{ tmp_dir }}/autoscaler.{{ cluster_name }}.yaml"

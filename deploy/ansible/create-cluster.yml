@@ -47,3 +47,6 @@
     - helm
     - aws_resources
     - k8s_resources
+
+  environment:
+    PATH: "{{ lookup('env','HOME') }}/bin:{{ lookup('env','PATH') }}"

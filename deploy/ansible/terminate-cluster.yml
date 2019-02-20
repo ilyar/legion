@@ -14,3 +14,6 @@
 
   roles:
     - k8s_terminate_cluster
+
+  environment:
+    PATH: "{{ lookup('env','HOME') }}/bin:{{ lookup('env','PATH') }}"

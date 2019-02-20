@@ -50,3 +50,6 @@
       name: legion_enclave
     vars:
       enclave: "{{ enclave_name }}"
+
+  environment:
+    PATH: "{{ lookup('env','HOME') }}/bin:{{ lookup('env','PATH') }}"

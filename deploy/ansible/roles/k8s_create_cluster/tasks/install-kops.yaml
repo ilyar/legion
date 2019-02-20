@@ -7,10 +7,9 @@
 - name: Download Kops binaries
   get_url:
     url: "{{ kops_download_path }}"
-    dest: /usr/local/bin/kops
+    dest: "{{ bin_dir }}/kops"
     owner: root
     group: root
     mode: 0755
     force: yes
     sha256sum: "{{ kops_sha256sum }}"
-  become: true

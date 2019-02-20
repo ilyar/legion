@@ -66,3 +66,6 @@
     loop: "{{ iam_roles.stdout_lines }}"
     loop_control:
       loop_var: iam_role
+
+    environment:
+      PATH: "{{ lookup('env','HOME') }}/bin:{{ lookup('env','PATH') }}"

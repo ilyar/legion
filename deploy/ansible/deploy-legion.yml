@@ -46,3 +46,6 @@
       with_items: "{{ enclaves }}"
       loop_control:
         loop_var: enclave
+
+  environment:
+    PATH: "{{ lookup('env','HOME') }}/bin:{{ lookup('env','PATH') }}"

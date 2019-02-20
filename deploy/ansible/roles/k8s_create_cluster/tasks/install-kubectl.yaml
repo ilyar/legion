@@ -7,11 +7,10 @@
 - name: Download Kubectl binaries
   get_url:
     url: "{{ kubectl_download_path }}/{{ item }}"
-    dest: /usr/local/bin
+    dest: "{{ bin_dir }}/kubectl"
     owner: root
     group: root
     mode: 0755
     force: yes
   with_items:
     - kubectl
-  become: true

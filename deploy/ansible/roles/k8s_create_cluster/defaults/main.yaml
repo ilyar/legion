@@ -13,10 +13,12 @@ aws_image:  kope.io/k8s-1.11-debian-stretch-amd64-hvm-ebs-2018-08-17
 kubernetes_version: 1.11.6
 
 # TLS defaults
-tls_cert_dir: /srv/ssl/{{ base_domain }}
+tls_cert_dir: /tmp/{{ base_domain }}
 tls_cert_common_name: "{{ base_domain }}"
 tls_key_file_name: "{{ tls_cert_common_name }}.key"
 tls_fullchain_file_name: "{{ tls_cert_common_name }}.fullchain.crt"
 tls_certificates_target_namespaces:
 - kube-system
 - default
+
+bin_dir: "{{ lookup('env','HOME') }}/bin"
