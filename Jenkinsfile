@@ -48,8 +48,6 @@ pipeline {
             param_test_pypi_distribution_target_name = "${params.testPyPiDistributionTargetName}"
             param_public_pypi_distribution_target_name = "${params.PublicPyPiDistributionTargetName}"
             param_pypi_distribution_target_name = "${params.PyPiDistributionTargetName}"
-            param_jenkins_plugins_repository_store = "${params.JenkinsPluginsRepositoryStore}"
-            param_jenkins_plugins_repository = "${params.JenkinsPluginsRepository}"
             param_docker_registry = "${params.DockerRegistry}"
             param_docker_hub_registry = "${params.DockerHubRegistry}"
             ///Job parameters
@@ -165,46 +163,6 @@ pipeline {
 
         stage('Build dependencies') {
             parallel {
-                stage('Build Jenkins plugin') {
-                    steps {
-                        script{
-                            docker.image("maven:3.5.3-jdk-8").inside("-v /tmp/.m2:/tmp/.m2 -e HOME=/tmp -u root") {
-                                /// Jenkins plugin which will be used in Jenkins Docker container only
-                                sh """
-                                export JAVA_HOME=\$(readlink -f /usr/bin/java | sed "s:bin/java::")
-                                mvn -f k8s/jenkins/legion-jenkins-plugin/pom.xml clean -Dmaven.repo.local=/tmp/.m2/repository
-                                mvn -f k8s/jenkins/legion-jenkins-plugin/pom.xml versions:set -DnewVersion=${Globals.buildVersion} -Dmaven.repo.local=/tmp/.m2/repository
-                                mvn -f k8s/jenkins/legion-jenkins-plugin/pom.xml install -Dmaven.repo.local=/tmp/.m2/repository
-                                """
-
-                                archiveArtifacts 'k8s/jenkins/legion-jenkins-plugin/target/legion-jenkins-plugin.hpi'
-
-                                withCredentials([[
-                                    $class: 'UsernamePasswordMultiBinding',
-                                    credentialsId: 'nexus-local-repository',
-                                    usernameVariable: 'USERNAME',
-                                    passwordVariable: 'PASSWORD']]) {
-                                    sh """
-                                    curl -v -u $USERNAME:$PASSWORD \
-                                    --upload-file k8s/jenkins/legion-jenkins-plugin/target/legion-jenkins-plugin.hpi \
-                                    ${env.param_jenkins_plugins_repository_store}/${Globals.buildVersion}/legion-jenkins-plugin.hpi
-                                    """
-                                    script {
-                                        if (env.param_stable_release){
-                                            sh """
-                                            curl -v -u $USERNAME:$PASSWORD \
-                                            --upload-file k8s/jenkins/legion-jenkins-plugin/target/legion-jenkins-plugin.hpi \
-                                            ${env.param_jenkins_plugins_repository_store}/latest/legion-jenkins-plugin.hpi
-                                            """
-                                        }
-                                    }
-                                }
-                                sh "rm -rf ${WORKSPACE}/k8s/jenkins/legion-jenkins-plugin/*"
-                            }
-                        }
-                    }
-                }
-
                 stage('Run Python code analyzers') {
                     steps {
                         script{
@@ -291,7 +249,7 @@ EOL
                         }
                     }
                 }
-            } 
+            }
         }
 
         stage('Build docs') {
@@ -313,7 +271,7 @@ EOL
                 }
             }
         }
-        
+
         stage("Build and Upload Base Docker Image & Ansible image ") {
             parallel {
                 stage ("Build Base python image") {
@@ -364,17 +322,6 @@ EOL
                         }
                     }
                 }
-                stage("Build Jenkins Docker image") {
-                    steps {
-                        script {
-                            legion.pullDockerCache(['jenkins/jenkins:2.121.3'], 'k8s-edge')
-                            sh """
-                            cd k8s/jenkins
-                            docker build ${Globals.dockerCacheArg} --cache-from=jenkins/jenkins:2.121.3 --cache-from=${env.param_docker_registry}/k8s-jenkins:${env.param_docker_cache_source} --build-arg update_center_url="" --build-arg update_center_experimental_url="${env.param_jenkins_plugins_repository}" --build-arg update_center_download_url="${env.param_jenkins_plugins_repository}" --build-arg legion_plugin_version="${Globals.buildVersion}" -t legion/k8s-jenkins:${Globals.buildVersion} ${Globals.dockerLabels} .
-                            """
-                        }
-                    }
-                }
                 stage("Build Edi Docker image") {
                     steps {
                         script {
@@ -382,6 +329,17 @@ EOL
                             sh """
                             cd k8s/edi
                             docker build ${Globals.dockerCacheArg} --cache-from=legion/base-python-image:${Globals.buildVersion} --cache-from=${env.param_docker_registry}/k8s-edi:${env.param_docker_cache_source} --build-arg version="${Globals.buildVersion}" --build-arg pip_extra_index_params="--extra-index-url ${env.param_pypi_repository}" --build-arg pip_legion_version_string="==${Globals.buildVersion}" -t legion/k8s-edi:${Globals.buildVersion} ${Globals.dockerLabels} .
+                            """
+                        }
+                    }
+                }
+                stage("Build Controller Docker image") {
+                    steps {
+                        script {
+                            legion.pullDockerCache([], 'k8s-controller')
+                            sh """
+                            cd k8s/controller
+                            docker build ${Globals.dockerCacheArg} --cache-from=legion/base-python-image:${Globals.buildVersion} --cache-from=${env.param_docker_registry}/k8s-controller:${env.param_docker_cache_source} --build-arg version="${Globals.buildVersion}" --build-arg pip_extra_index_params="--extra-index-url ${env.param_pypi_repository}" --build-arg pip_legion_version_string="==${Globals.buildVersion}" -t legion/k8s-controller:${Globals.buildVersion} ${Globals.dockerLabels} .
                             """
                         }
                     }
@@ -561,13 +519,6 @@ EOL
                         }
                     }
                 }
-                stage('Upload Jenkins Docker image') {
-                    steps {
-                        script {
-                            legion.uploadDockerImage('k8s-jenkins')
-                        }
-                    }
-                }
                 stage("Upload test models") {
                     steps {
                         script {
@@ -584,6 +535,13 @@ EOL
                     steps {
                         script {
                             legion.uploadDockerImage('k8s-edi')
+                        }
+                    }
+                }
+                stage('Upload Controller Docker image') {
+                    steps {
+                        script {
+                            legion.uploadDockerImage('k8s-controller')
                         }
                     }
                 }

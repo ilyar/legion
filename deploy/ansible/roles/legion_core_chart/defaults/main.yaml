@@ -1,3 +1,6 @@
 ---
 
 helm_local_src: false
+examples_repository:
+  uri: git@github.com:legion-platform/legion.git
+  ref: develop

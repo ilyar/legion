@@ -30,6 +30,19 @@ LEGION_COMPONENT_NAME_API = 'edge'
 LEGION_COMPONENT_NAME_GRAFANA = 'grafana'
 LEGION_COMPONENT_NAME_GRAPHITE = 'graphite'
 
+LEGION_CRD_GROUP = 'legion-platform.org'
+
+LEGION_CRD_MODEL_TRAININGS = 'v1', 'model-trainings'
+
+LEGION_CRD_LABEL_TYPE = 'legion.type'
+LEGION_CRD_OWNER_ID = 'legion.owner.id'
+LEGION_CRD_OWNER_NAME = 'legion.owner.name'
+LEGION_CRD_OWNER_TYPE = 'legion.owner.type'
+LEGION_CRD_SUB_NAME = 'legion.name'
+LEGION_CRD_CHILD_REVISION = 'legion.object-version'
+
+LEGION_CRD_ANNOTATION_ROOT = 'legion.info'
+
 LEGION_API_SERVICE_PORT = 'api'
 
 ENCLAVE_NAMESPACE_LABEL = 'enclave'

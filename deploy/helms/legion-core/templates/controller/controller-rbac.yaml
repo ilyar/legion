@@ -1,5 +1,4 @@
-{{ if .Values.jenkins.enabled -}}
-{{ if .Values.jenkins.rbac -}}
+{{ if .Values.rbac -}}
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
@@ -7,9 +6,11 @@ metadata:
     heritage: {{ .Release.Service | quote }}
     release: {{ .Release.Name | quote }}
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-    component: "{{ .Release.Name }}-jenkins"
-  name: jenkins
+    component: "{{ .Release.Name }}-controller-rbac"
+  name: "{{ .Release.Name }}-controller"
 rules:
+- apiGroups: ["legion-platform.org"]
+  resources: ["vcss", "model-trainings"]
 - apiGroups: [""]
   resources: ["pods"]
   verbs: ["create","delete","get","list","patch","update","watch"]
@@ -30,15 +31,15 @@ metadata:
     heritage: {{ .Release.Service | quote }}
     release: {{ .Release.Name | quote }}
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-    component: "{{ .Release.Name }}-jenkins"
-  name: jenkins
+    component: "{{ .Release.Name }}-controller"
+  name: "{{ .Release.Name }}-controller"
 subjects:
 - kind: ServiceAccount
   namespace: {{ .Release.Namespace }}
-  name: jenkins
+  name: "{{ .Release.Name }}-controller"
 roleRef:
   kind: ClusterRole
-  name: jenkins
+  name: "{{ .Release.Name }}-controller"
   apiGroup: rbac.authorization.k8s.io
 ---
 apiVersion: v1
@@ -48,8 +49,7 @@ metadata:
     heritage: {{ .Release.Service | quote }}
     release: {{ .Release.Name | quote }}
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-    component: "{{ .Release.Name }}-jenkins"
-  name: jenkins
-{{- end }}
+    component: "{{ .Release.Name }}-controller"
+  name: "{{ .Release.Name }}-controller"
 {{- end }}
 

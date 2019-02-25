@@ -525,3 +525,8 @@ MODEL_K8S_MEMORY = ConfigVariableDeclaration('MODEL_K8S_MEMORY', '256Mi', str, '
 MODEL_K8S_CPU = ConfigVariableDeclaration('MODEL_K8S_CPU', '256m', str, 'Default k8s cpu for a model', True)
 REDUCE_MODEL_REQUESTS_BY = ConfigVariableDeclaration('REDUCE_MODEL_REQUESTS_BY', 33, int,
                                                      'Reduce k8s resource for model by specific percent', True)
+
+
+TOOLCHAIN_BOOTUP_SCRIPT_PYTHON = ConfigVariableDeclaration('TOOLCHAIN_BOOTUP_SCRIPT_PYTHON',
+                                                           'legion-bootup-python',
+                                                           str, '', False)

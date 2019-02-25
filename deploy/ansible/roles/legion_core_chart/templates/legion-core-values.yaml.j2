@@ -1,10 +1,9 @@
 rootDomain: {{ base_domain }}
-clusterName: {{ cluster_name }}
-namespace: default
-localDomain: "cluster.local"
-addLocalDomain: true
-s3BucketName: "{{ legion_data_s3_bucket }}"
-cluster_prefix: "{{ env_name }}"
+rbac: true
+dockerHubGroup: "{{ docker_repo }}"
+pypiServer: "{{ pypi_repo }}"
+version: "{{ legion_version }}"
+
 
 {% if dex.enabled == true %}
 auth:
@@ -16,69 +15,6 @@ auth:
     nginx.ingress.kubernetes.io/auth-url: http://oauth2-proxy.kube-system.svc.cluster.local:4180/oauth2/auth
 {% endif %}
 
-package:
-  version: "{{ legion_version }}"
-  repository: "{{ pypi_repo }}"
-
-  baseImage:
-    repository: "{{ docker_repo }}/base-python-image"
-    tag: "{{ legion_version }}"
-
-jenkins:
-  enabled: true
-  persistence:
-    storageClass: {% if persistent_jenkins_volume %}"jenkins-volume"{% else %}""{% endif %}
-
-    size: {{ jenkins_volume_size | default('20') }}Gi
-
-  dags_volume_pvc: "{{ airflow_dags_pvc }}"
-  airflow_dags_directory: "{{ airflow_dags_dir }}"
-  image:
-    repository: "{{ docker_repo }}/k8s-jenkins"
-    tag: "{{ legion_version }}"
-
-  git_secret_name: "{{ git_secret_name }}"
-
-  ingress:
-    tls:
-      enabled: {% if use_https == "yes" %}true{% else %}false{% endif %}
-
-  airflow:
-    enabled: true
-    rest_url: 'http://airflow-web:8080/admin/rest_api'
-    s3_url: "s3://{{ legion_data_s3_bucket }}/"
-    expected_output: '{{ airflow_expected_output }}'
-
-  openId:
-    enable: {{ dex.enabled | default(false) | bool }}
-    clientId: {{ dex.config.client_id | default("~") }}
-    clientSecret: {{ dex.config.client_secret | default("~") }}
-    tokenServerUrl: https://dex.{{ cluster_name }}/token
-    authServerUrl: https://dex.{{ cluster_name }}/auth
-    adminGroups: "
-    {%- for item in dex.groups_binding.kubernetes -%}
-    {%- if item.clusterrolebinding == "cluster-admin" %} {{ item.name }}
-    {%- endif -%}
-    {% endfor %}
-    {%- for item in dex.groups_binding.jenkins -%}
-    {%- if item.role == "admin" %} {{ item.name }}
-    {%- endif -%}
-    {% endfor %}"
-    readOnlyGroups: "
-    {%- for item in dex.groups_binding.kubernetes -%}
-    {%- if item.clusterrolebinding == "view" %} {{ item.name }}
-    {%- endif -%}
-    {% endfor %}
-    {%- for item in dex.groups_binding.jenkins -%}
-    {%- if item.role == "view" %} {{ item.name }}
-    {%- endif -%}
-    {% endfor %}"
-
-graphite:
-  enabled: true
-  image:
-    repository: "hopsoft/graphite-statsd"
-    tag: "v0.9.15-phusion0.9.18@sha256:b4d170e1c31b7474adb5e91fa789e50bb15f003fe6e6717393a597142815efdd"
 
 grafana:
   adminUser: "{{ grafana.admin.username }}"
@@ -86,7 +22,6 @@ grafana:
   ingress:
     hosts:
       - "grafana.{{ base_domain }}"
-      - "grafana.local.{{ base_domain }}"
     tls:
       - secretName: "{{ base_domain }}-tls"
         hosts: ["grafana.{{ base_domain }}"]

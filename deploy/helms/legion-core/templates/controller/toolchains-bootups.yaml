@@ -1,0 +1,8 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Release.Name }}-bootup-python"
+data:
+  bootstrapper.py: |-
+{{ .Files.Get "files/toolchains/python/bootstrapper.py" | indent 4 }}

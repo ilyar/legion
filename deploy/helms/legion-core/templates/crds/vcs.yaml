@@ -1,0 +1,45 @@
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: vcss.legion-platform.org
+spec:
+  group: legion-platform.org
+  version: v1
+  scope: Namespaced
+  names:
+    plural: vcss
+    singular: vcs
+    kind: VCS
+    shortNames:
+    - vcs
+    categories:
+    - all
+    - serving
+    - legion
+  validation:
+    openAPIV3Schema:
+      required:
+      - spec
+      properties:
+        spec:
+          description: 'Parameters of VCS. Should be declared'
+          required:
+          - uri
+          - defaultRef
+          properties:
+            uri:
+              description: 'Repository URI. Should have prefix git+ssh / git+https'
+              type: string
+            defaultRef:
+              description: 'Default ref in repository'
+              type: string
+            privateKey:
+              description: 'Private Key. Optional'
+              type: string
+  additionalPrinterColumns:
+    - name: URL
+      type: string
+      JSONPath: .spec.uri
+    - name: Default Ref
+      type: string
+      JSONPath: .spec.defaultRef

@@ -1,0 +1,23 @@
+---
+
+- set_fact:
+    tmp_vcs_file: "{{ tmp_dir }}/legion-vcs.{{ cluster_name }}.yaml"
+    vcs_resource_name: legion-repo-git
+
+- name: Create VCS resource definition file
+  template:
+    src: legion-vcs.yaml.j2
+    dest: "{{ tmp_vcs_file }}"
+    mode: 0777
+  vars:
+    vcs_name: "{{ vcs_resource_name }}"
+    namespace: default
+    git_repository: "{{ examples_repository.uri }}"
+    git_branch: "{{ examples_repository.ref }}"
+    git_private_key: "{{ jenkins.git_key | b64decode }}"
+
+- name: Remove old VCS resource
+  shell: kubectl --context {{ cluster_name }} delete vcs.legion-platform.org {{ vcs_resource_name }} --ignore-not-found=true
+
+- name: Create VCS resource
+  shell: kubectl --context {{ cluster_name }} apply -f "{{ tmp_vcs_file }}"

@@ -1,4 +1,5 @@
 graft legion/containers
+graft legion/controller
 graft legion/edi
 graft legion/external
 graft legion/k8s

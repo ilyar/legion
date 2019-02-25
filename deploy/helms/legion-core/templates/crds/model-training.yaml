@@ -1,0 +1,129 @@
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: model-trainings.legion-platform.org
+spec:
+  group: legion-platform.org
+  version: v1
+  scope: Namespaced
+  names:
+    plural: model-trainings
+    singular: model-training
+    kind: ModelTraining
+    shortNames:
+    - mt
+    categories:
+    - all
+    - serving
+    - legion
+  validation:
+    openAPIV3Schema:
+      required:
+      - spec
+      properties:
+        spec:
+          description: 'Parameters of training object. Should be declared'
+          required:
+          - entrypoint
+          - vcs
+          properties:
+            toolchain:
+              description: 'Name of toolchain that is used for model building. Defaults to python.'
+              type: string
+              enum:
+              - 'python'
+            image:
+              description: 'Image on which training will be sceduled. Should be legion-compatible image.
+                Defaults to built-in toolchain accoring toolchain name'
+              type: string
+            vcs:
+              description: 'Name of VCS configuration object. Cannot be none'
+              type: string
+            customVcsBranch:
+              description: 'Use specific VCS branch. By default VCS object branch will be used'
+              type: string
+            resources:
+              description: 'Resources that are required to build a model'
+              properties:
+                ram:
+                  description: 'Required RAM resources to train model. Or default (depends on installation)'
+                  anyOf:
+                  - type: string
+                  - type: integer
+                cpu:
+                  description: 'Required CPU resources to train model. Or default (depends on installation)'
+                  anyOf:
+                  - type: string
+                  - type: integer
+            parameters:
+              description: 'Input training parameters (hyperparameters)'
+              type: object
+            entrypoint:
+              description: 'Path of training script / notebook / etc., (depends on toolchain)'
+              type: string
+            arguments:
+              description: 'Additional arguments for training script'
+              type: array
+              items:
+                anyOf:
+                - type: string
+                - type: integer
+        status:
+          description: 'State of model training. Cannot be updated directly (is being updated by Controller)'
+          properties:
+            state:
+              description: 'Current train state'
+              type: string
+              enum:
+              - registered
+              - scheduled
+              - running
+              - finihed
+            result:
+              description: 'Train result'
+              type: string
+              enum:
+              - unknown
+              - success
+              - fail
+            failure:
+              description: 'Type of failure'
+              type: string
+              enum:
+              - cannot-start-building
+              - cannot-fetch-source-code
+              - cannot-build-model
+              - cannot-push-model
+              - general-failure
+  additionalPrinterColumns:
+    - name: State
+      type: string
+      JSONPath: .status.state
+    - name: Result
+      type: string
+      JSONPath: .status.result
+    - name: Failure Reason
+      type: string
+      JSONPath: .status.failure
+    - name: Toolchain
+      type: string
+      JSONPath: .spec.toolchain
+    - name: VCS
+      type: string
+      JSONPath: .spec.vcs
+    - name: VCS branch
+      type: string
+      JSONPath: .spec.customVcsBranch
+    - name: Entrypoint
+      type: string
+      JSONPath: .spec.entrypoint
+
+#    - name: Desired replicas
+#      type: integet
+#      JSONPath: .spec.replicas
+#    - name: Ready
+#      type: string
+#      JSONPath: ".status.conditions[?(@.type==\"Ready\")].status"
+#    - name: Reason
+#      type: string
+#      JSONPath: ".status.conditions[?(@.type==\"Ready\")].reason"

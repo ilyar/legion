@@ -1,0 +1,9 @@
+apiVersion: legion-platform.org/v1
+kind: VCS
+metadata:
+  name: "{{ vcs_name }}"
+  namespace: "{{ namespace }}"
+spec:
+  uri: "{{ git_repository }}"
+  defaultRef: "{{ git_branch }}"
+  privateKey: "{{ git_private_key }}"

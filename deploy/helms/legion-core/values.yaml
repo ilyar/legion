@@ -1,53 +1,16 @@
+# Should be configured due installation
 rootDomain: k8s-nightly.epm.kharlamov.biz
-localDomain: "cluster.local"
-enclaveDeploymentPrefix: "legion-"
-domainDelimiter: "."
-s3BucketName: ""
-cluster_prefix: ""
+
+# Default values may be used
+rbac: true
+
+dockerHubGroup: "legion"
+pypiServer: ""
+version: "latest"
 
 auth:
   enabled: false
   annotations: {}
-
-jenkins:
-  enabled: true
-  image:
-    repository: "legion/k8s-jenkins"
-    tag: "latest"
-
-  rbac: true
-
-  ingress:
-    enabled: true
-    annotations: {}
-    domain:
-      partial: jenkins
-    tls:
-      enabled: true
-      autoSecretNameDeduction: true
-
-  git_secret_name: false
-
-  persistence:
-    storageClass: ""
-    size: 20Gi
-
-  airflow:
-    enabled: false
-    rest_url: ''
-    s3_url: ''
-    expected_output: ''
-
-    dags_volume_pvc: ''
-
-  openId:
-    enable: false
-    clientId: ~
-    clientSecret: ~
-    tokenServerUrl: ~
-    authServerUrl: ~
-    adminGroups: ~
-    readOnlyGroups: ~
 
 connections:
   docker:
@@ -105,8 +68,11 @@ grafana:
       repository: legion/k8s-ansible
       tag: latest
 
-graphite:
-  url: "http://legion-core-graphite.default.svc.cluster.local:80"
-  enabled: true
 
+graphite:
+  enabled: true
+  url: "http://legion-core-graphite.default.svc.cluster.local:80"
+  image:
+    repository: "hopsoft/graphite-statsd"
+    tag: "v0.9.15-phusion0.9.18@sha256:b4d170e1c31b7474adb5e91fa789e50bb15f003fe6e6717393a597142815efdd"
 

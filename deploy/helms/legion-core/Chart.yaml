@@ -1,7 +1,7 @@
 name: legion-core
 version: 0.0.1
 appVersion: 1.7.1
-description: Legion stack core
+description: Legion system
 keywords:
 - ML
 maintainers:
