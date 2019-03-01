@@ -28,11 +28,11 @@ COPY jupyter_notebook_config.py /etc/jupyter/
 
 RUN ulimit -l 33554432 && apt-get update && apt-get install -y ssh && apt-get clean && apt-get autoclean
 
-ENV GIT_ASKPASS=/bin/echo
-ENV GIT_SSH_COMMAND=ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no
-ENV GIT_BIN=/usr/bin/git
-ENV GIT_CHECKOUT_SUB_FOLDER=src
-ENV PYTHON_INTERPRETER=/usr/bin/python3.6
+ENV GIT_ASKPASS="/bin/echo"
+ENV GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
+ENV GIT_BIN="/usr/bin/git"
+ENV GIT_CHECKOUT_SUB_FOLDER="src"
+ENV PYTHON_INTERPRETER="/usr/bin/python3.6"
 
 RUN pip3 install --disable-pip-version-check ./legion*.whl \
   && rm -f ./legion*.whl \
