@@ -63,29 +63,42 @@ install-robot:
 		python setup.py sdist && \
     	python setup.py bdist_wheel
 
-## docker-pipeline-agent: Build pipeline agent docker image
-docker-pipeline-agent:
-	docker build -t legion/python-pipeline:latest -f containers/pipeline/Dockerfile .
+## build-all-docker-images: build all docker images
+build-all-docker-images: build-docker-edge build-docker-edi build-docker-fluentd build-docker-operator build-docker-pipeline-agent build-docker-toolchains
 
-## docker-python-toolchain: Build python toolchain docker image
-docker-python-toolchain:
-	docker build -t legion/python-toolchain:latest -f containers/toolchains/python/Dockerfile .
-
-## docker-edi: Build edi docker image
-docker-edi:
-	docker build -t legion/k8s-edi:latest -f containers/edi/Dockerfile .
-
-## docker-edge: Build edge docker image
-docker-edge:
+## dbuild-docker-edge: Build edge docker image
+build-docker-edge:
 	docker build -t legion/k8s-edge:latest -f containers/edge/Dockerfile .
 
-## docker-model-builder: Build model builder docker image
-docker-model-builder:
+## build-docker-edi: Build edi docker image
+build-docker-edi:
+	docker build -t legion/k8s-edi:latest -f containers/edi/Dockerfile .
+
+## build-docker-fluentd: Build edi docker image
+build-docker-fluentd:
+	docker build -t legion/k8s-fluentd:latest -f containers/fluentd/Dockerfile .
+
+## build-docker-operator: Build all operator's docker images
+build-docker-operator: build-docker-operator-server build-docker-operator-model-builder
+
+## build-docker-operator-server: Build operator server docker image
+build-docker-operator-server:
+	docker build --target operator -t legion/k8s-operator:latest -f containers/operator/Dockerfile .
+
+## build-docker-operator-model-builder: Build model builder docker image (operator's sidecar)
+build-docker-operator-model-builder:
 	docker build --target model-builder -t legion/k8s-model-builder:latest -f containers/operator/Dockerfile .
 
-## docker-operator: Build operator docker image
-docker-operator:
-	docker build --target operator -t legion/k8s-operator:latest -f containers/operator/Dockerfile .
+## build-docker-pipeline-agent: Build pipeline agent docker image
+build-docker-pipeline-agent:
+	docker build -t legion/python-pipeline:latest -f containers/pipeline/Dockerfile .
+
+## build-docker-toolchains: Build all toolchains
+build-docker-toolchains: build-docker-python-toolchain
+
+## build-docker-python-toolchain: Build python toolchain docker image
+build-docker-python-toolchain:
+	docker build -t legion/python-toolchain:latest -f containers/toolchains/python/Dockerfile .
 
 ## push-model-builder: Push model builder docker image
 push-model-builder:
