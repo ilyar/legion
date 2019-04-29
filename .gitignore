@@ -21,6 +21,8 @@ cover/
 
 legion-activate.sh
 legion/legion/data/Pipfile.lock
+docs/out/
+.doctrees/
 
 test.model
 .noseids

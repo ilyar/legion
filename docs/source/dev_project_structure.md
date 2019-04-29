@@ -32,7 +32,15 @@ Project **Legion** locates in GitHub Repository [legion-platform/legion](https:/
 * Legion Python source codes
 * Legion Operator (not released yet)
 
-## Legion for AWS
+### Legion's repository directory structure
+* `containers` - all Legion components that are distributed as docker images. [Details](containers/README.md)
+* `docs` - documentation that describes Legion platform, architecture, usage and etc.
+* `examples` - examples of machine learning models that could be trained and deployed in Legion, examples base on public available models (such as sklearn digit classifier, MovieLens model, Logistic Regression classifier on Census Income Data) and some syntetic models. [Details](examples/README.md)
+* `helms` - Legion Helm packages (distribution packages for Kubernetes).
+* `legion` - source code of Legion python packages.
+* `scripts` - utilitary scripts for CI/CD process.
+
+## Infra-specific repositories
 For deploying purposes there are platform-specific repositories that contains platform-specific deploying logic.
 
 **Legion AWS** locates in GitHub Repository [legion-platform/legion-aws](https://github.com/legion-platform/legion-aws) and contains:
@@ -44,9 +52,5 @@ For deploying purposes there are platform-specific repositories that contains pl
   * Kube-fluentd
   * Oauth2-proxy
 
-## Legion Airflow
+## Additional integrations repositories
 
-
-## Legion CI
-
-_UNDER CONSIDERATION_
