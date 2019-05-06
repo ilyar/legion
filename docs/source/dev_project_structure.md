@@ -2,16 +2,14 @@
 
 ## What is it inside Legion?
 Core:
-* Python 3.6 – as main development language
-* Ansible – as tool for implementing infra-as-a-code
+* Python 3.6, Golang – as main development languages
 * Kubernetes – as runtime platform
 * Docker – as containerization engine for runtime platform
-* Grafana – as metrics dashboard
-* Prometheus – as storage for cluster metrics
-* FluentD – as logging aggregator for cluster logs and feedback loop
-* EDGE – as model API traffic manager
-* EDI – model manager
-* Toolchains - APIs for adding to ML Legion capabilities
+* [FluentD](./cmp_feedback.md) – as logging aggregator for feedback loop
+* [Operator](./cmp_operator.md) - as handler of Legion's custom resources
+* [EDGE](./cmp_edge.md) – as model API traffic manager
+* [EDI](./cmp_edi.md) – model manager
+* [Toolchains](./tlch_about.md) - APIs for adding to ML Legion capabilities
 
 Optional:
 * Airflow – as optional ETL engine
@@ -26,11 +24,11 @@ Project **Legion** locates in GitHub Repository [legion-platform/legion](https:/
   * EDGE
   * FluentD
   * Toolchain application
-* HELM packages:
+* [HELM packages](./gen_distros.md):
   * legion-core HELM chart
   * legion HELM chart
 * Legion Python source codes
-* Legion Operator (not released yet)
+* [Operator](./cmp_operator.md)
 
 ### Legion's repository directory structure
 * `containers` - all Legion components that are distributed as docker images. [Details](containers/README.md)

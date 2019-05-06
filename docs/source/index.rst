@@ -16,6 +16,7 @@ Welcome to Legion's documentation!
 
    gs_prerequirements
    gs_deploying_legion
+   gs_what_is_model
    gs_model_development
    gs_training_model
    gs_deploying_model
