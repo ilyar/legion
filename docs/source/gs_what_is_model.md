@@ -2,7 +2,7 @@
 
 Model, in terms of legion may be represented in 2 ways:
 * Source code of models, that is stored on Git server. This code uses appropriate toolchains and calls Legion's API for exporting functions.
-* Built model (almost all during this documentation term **model** means **built model**). Its structure defined [below].
+* Built model (almost all during this documentation term **model** means **built model**). Its structure is defined [below](#build-model).
 
 ## Source code of model
 Source code of model should use appropriate [toolchain](./tlch_about.md). Some examples, what calls should be done, given in [the examples folder](https://github.com/legion-platform/legion/tree/develop/examples).

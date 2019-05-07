@@ -16,8 +16,10 @@ Legion supports [oauth2_proxy](https://github.com/bitly/oauth2_proxy) gateway, t
 
 For details about integration with oauth2_proxy and CoreOS Dex please refer [specialized section](./ref_oauth2_proxy.md).
 
-### Monitoring facilities
-
 ### Kubernetes cluster autoscaling facilities
+Auto scaling ability can be added to Legion using any Kubernetes auto scaler due the fact that Legion uses native Kubernetes object for training and deployment purposes.
 
-###
+## Another integrations
+* [Airflow (ETL)](./int_airflow.md)
+* [Jenkins (CI/CD)](./int_jenkins.md)
+* [Prometheus (metrics)](./int_metrics.md)

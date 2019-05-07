@@ -50,6 +50,7 @@ Welcome to Legion's documentation!
 
    int_metrics
    int_airflow
+   int_jenkins
 
 .. toctree::
    :maxdepth: 1

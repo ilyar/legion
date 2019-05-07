@@ -13,6 +13,7 @@ Core:
 
 Optional:
 * Airflow – as optional ETL engine
+* Jenkins - as optional model CI/CD server
 
 
 # Repositories structure
@@ -51,4 +52,5 @@ For deploying purposes there are platform-specific repositories that contains pl
   * Oauth2-proxy
 
 ## Additional integrations repositories
-
+* [Airflow](https://github.com/legion-platform/legion-airflow)
+* [Jenkins](https://github.com/legion-platform/legion-jenkins)
