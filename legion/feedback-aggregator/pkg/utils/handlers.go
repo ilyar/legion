@@ -18,10 +18,11 @@ package utils
 
 import (
 	"fmt"
+	"github.com/legion-platform/legion/legion/feedback-aggregator/pkg/feedback"
 	"log"
 	"net/http"
 
-	gin "github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin"
 )
 
 func handleIndex(c *gin.Context) {
@@ -29,28 +30,28 @@ func handleIndex(c *gin.Context) {
 }
 
 func handleFeedbackEndpoint(c *gin.Context) {
-	modelID := c.Param("model_id")
-	modelVersion := c.Param("model_version")
+	modelName := c.GetHeader(feedback.ModelNameHeaderKey)
+	modelVersion := c.GetHeader(feedback.ModelVersionHeaderKey)
 
-	if len(modelID) == 0 || len(modelVersion) == 0 {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Incorrect model_id / model_version field value"})
+	message := feedback.ModelFeedback{
+		ModelName:    modelName,
+		ModelVersion: modelVersion,
+	}
+
+	if len(modelName) == 0 || len(modelVersion) == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Incorrect model_name / model_version header value"})
 		return
 	}
 
-	requestID := c.GetHeader(requestIDHeader)
-	if len(requestID) == 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("%s header is missed", requestIDHeader)})
+	message.RequestID = c.GetHeader(feedback.RequestIdHeaderKey)
+	if len(message.RequestID) == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("%s header is missed", message.RequestID)})
 		return
 	}
 
-	message := map[string]interface{}{
-		"payload":       ParseRequestDataset(c),
-		"request_id":    requestID,
-		"model_id":      modelID,
-		"model_version": modelVersion,
-	}
+	message.Payload = ParseRequestDataset(c)
 
-	logger := c.MustGet(dataLoggingInstance).(dataLogging)
+	logger := c.MustGet(dataLoggingInstance).(feedback.DataLogging)
 	loggerTag := c.MustGet(dataLoggingTag).(string)
 
 	err := logger.Post(loggerTag, message)

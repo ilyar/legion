@@ -28,7 +28,6 @@ import kubernetes.config.config_exception
 import urllib3
 import yaml
 from legion.robot.utils import wait_until
-from legion.services.k8s import utils as k8s_utils
 
 FAT_POD_MEMORY = "4Gi"
 FAT_POD_CPU = "4"
@@ -36,14 +35,14 @@ FAT_POD_IMAGE = 'alpine:3.9.3'
 FAT_POD_NAME = "fat-pod-name"
 
 
-def generate_stub_model(model_id: str, model_version: str) -> str:
+def generate_stub_model(model_name: str, model_version: str) -> str:
     """
     Generate name for stub model training custom resource
-    :param model_id: model id
+    :param model_name: model name
     :param model_version: model version
     :return: name
     """
-    return f"stub-model-{model_id}-{model_version}"
+    return f"stub-model-{model_name}-{model_version}"
 
 
 class K8s:
@@ -60,12 +59,14 @@ class K8s:
         """
         self._context = None
         self._information = None
-        self._model_training_group = 'legion.legion-platform.org'
+        self._legion_group = 'legion.legion-platform.org'
         self._model_training_version = 'v1alpha1'
         self._namespace = namespace
         self._model_training_plural = 'modeltrainings'
-        self._model_training_info = self._model_training_group, self._model_training_version, \
+        self._model_training_info = self._legion_group, self._model_training_version, \
                                     self._namespace, self._model_training_plural
+        self._model_deployment_info = self._legion_group, 'v1alpha1', \
+                                      self._namespace, 'modeldeployments'
         self._default_vcs = 'legion'
 
     def build_client(self):
@@ -93,7 +94,6 @@ class K8s:
         :return: None
         """
         self._context = context
-        k8s_utils.CONNECTION_CONTEXT = context
 
         self.build_client()
 
@@ -169,13 +169,13 @@ class K8s:
         if not wait_until(pod_completed_lambda, iteration_duration=10, iterations=120):
             raise Exception("Timeout")
 
-    def delete_stub_model_training(self, model_id, model_version):
+    def delete_stub_model_training(self, model_name, model_version):
         """
         Delete model training resource
-        :param model_id: model id
+        :param model_name: model name
         :param model_version: model version
         """
-        self.delete_model_training(generate_stub_model(model_id, model_version))
+        self.delete_model_training(generate_stub_model(model_name, model_version))
 
     def delete_model_training(self, name):
         """
@@ -191,10 +191,10 @@ class K8s:
             if e.status != 404:
                 raise e
 
-    def create_stub_model_training(self, model_id, model_version):
+    def create_stub_model_training(self, model_name, model_version):
         """
         Create model training resource
-        :param model_id: model id
+        :param model_name: model name
         :param model_version: modle version
         """
         crds = kubernetes.client.CustomObjectsApi()
@@ -205,12 +205,12 @@ class K8s:
                 "apiVersion": "legion.legion-platform.org/v1alpha1",
                 "kind": "ModelTraining",
                 "metadata": {
-                    "name": generate_stub_model(model_id, model_version)
+                    "name": generate_stub_model(model_name, model_version)
                 },
                 "spec": {
                     "workDir": "legion/tests/e2e/models",
                     "entrypoint": 'simple.py',
-                    'args': ['--id', model_id, '--version', model_version],
+                    'args': ['--name', model_name, '--version', model_version],
                     "toolchain": "python",
                     "vcsName": self._default_vcs
                 }
@@ -268,37 +268,51 @@ class K8s:
         status = model_training.get('status')
         return status if status else {}
 
-    def build_stub_model(self, model_id, model_version):
+    def get_model_deployment_status(self, name):
+        """
+        Get model training status
+        :param name: name of a model training resource
+        :return: status
+        """
+        crds = kubernetes.client.CustomObjectsApi()
+
+        md = crds.get_namespaced_custom_object(*self._model_deployment_info, name.lower())
+        print(f'Fetched model training: {md}')
+
+        status = md.get('status')
+        return status if status else {}
+
+    def build_stub_model(self, model_name, model_version):
         """
         Full lifecycle of model training resource
-        :param model_id: model id
+        :param model_name: model name
         :param model_version: model version
         :return: status of a model training resource
         """
-        self.delete_stub_model_training(model_id, model_version)
-        self.create_stub_model_training(model_id, model_version)
-        self.wait_stub_model_training(model_id, model_version)
+        self.delete_stub_model_training(model_name, model_version)
+        self.create_stub_model_training(model_name, model_version)
+        self.wait_stub_model_training(model_name, model_version)
 
-        return self.get_stub_model_training_status(model_id, model_version)
+        return self.get_stub_model_training_status(model_name, model_version)
 
-    def get_stub_model_training_status(self, model_id, model_version):
+    def get_stub_model_training_status(self, model_name, model_version):
         """
         Get stub model training resource status
-        :param model_id: model id
+        :param model_name: model name
         :param model_version: model version
         :return:
         """
-        return self.get_model_training_status(generate_stub_model(model_id, model_version))
+        return self.get_model_training_status(generate_stub_model(model_name, model_version))
 
-    def wait_stub_model_training(self, model_id, model_version, expected_state="succeeded"):
+    def wait_stub_model_training(self, model_name, model_version, expected_state="succeeded"):
         """
         Wait specific status of a stub model training resource
-        :param model_id: model id
+        :param model_name: model name
         :param model_version: model version
         :param expected_state: expected state
         :return:
         """
-        return self.wait_model_training(generate_stub_model(model_id, model_version), expected_state)
+        return self.wait_model_training(generate_stub_model(model_name, model_version), expected_state)
 
     def wait_model_training(self, name, expected_state="succeeded"):
         """
@@ -408,27 +422,18 @@ class K8s:
             raise Exception("Deployment '%s' is not ready: %d/%d replicas are running"
                             % (deployment_name, deployment.status.ready_replicas, deployment.status.replicas))
 
-    def get_model_deployment(self, model_id, model_version, namespace):
+    def get_model_deployment(self, deployment_name):
         """
-        Get dict of deployment by model id and version
+        Get dict of deployment by model name and version
 
-        :param model_id: model id
-        :type model_id: str
-        :param model_version: model version
-        :type model_version: str
-        :param namespace: name of a namespace to look in
-        :type namespace: str
-        :return: number of replicas for a specified deployment
-        :rtype int
+        :param deployment_name: k8s deployment name
+        :type deployment_name: str
+        :return: k8s deployment object
         """
         client = self.build_client()
         extension_api = kubernetes.client.ExtensionsV1beta1Api(client)
-        label_selector = 'component=legion-model,com.epam.legion.model.id={},com.epam.legion.model.version={}'.format(
-            model_id, model_version
-        )
-        deployments = extension_api.list_namespaced_deployment(namespace, label_selector=label_selector)
 
-        return deployments.items[0] if deployments else None
+        return extension_api.read_namespaced_deployment(deployment_name, self._namespace)
 
     def get_deployment_replicas(self, deployment_name, namespace='default'):
         """

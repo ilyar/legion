@@ -122,6 +122,9 @@ def get_config_file_variable(variable, section=_DEFAULT_INI_SECTION):
     :type section: str
     :return: str or None -- value
     """
+    if not variable:
+        return None
+
     _load_config_file()
     if not _INI_FILE_CONTENT:
         return None
@@ -495,9 +498,9 @@ TEMP_DIRECTORY = ConfigVariableDeclaration('TEMP_DIRECTORY', None, str,
                                            True)
 
 # For using in tests scenarios
-MODEL_ID = ConfigVariableDeclaration('MODEL_ID', None, str, 'ID of current model', False)
+MODEL_NAME = ConfigVariableDeclaration('MODEL_NAME', None, str, 'Name of current model', False)
 
-MODEL_VERSION = ConfigVariableDeclaration('MODEL_VERSION', None, str, 'ID of current model', False)
+MODEL_VERSION = ConfigVariableDeclaration('MODEL_VERSION', None, str, 'Version of current model', False)
 
 MODEL_K8S_MEMORY = ConfigVariableDeclaration('MODEL_K8S_MEMORY', '256Mi', str, 'Default k8s memory for a model', True)
 MODEL_K8S_CPU = ConfigVariableDeclaration('MODEL_K8S_CPU', '256m', str, 'Default k8s cpu for a model', True)

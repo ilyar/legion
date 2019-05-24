@@ -60,11 +60,10 @@ func CalculateExpirationDate(expirationDateStr string) (unixExpirationDate int64
 }
 
 // HS256 algorithm
-func GenerateModelToken(modelId, modelVersion string, expirationDateUnix int64) (string, error) {
+func GenerateModelToken(mdName string, expirationDateUnix int64) (string, error) {
 	token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"model_id":      []string{modelId},
-		"model_version": []string{modelVersion},
-		"exp":           expirationDateUnix,
+		"md_name": []string{mdName},
+		"exp":     expirationDateUnix,
 	}).SignedString([]byte(viper.GetString(legion.JwtSecret)))
 	if err != nil {
 		return "", err

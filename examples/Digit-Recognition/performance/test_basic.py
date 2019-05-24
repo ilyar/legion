@@ -16,7 +16,7 @@
 import os
 
 from legion.sdk.clients import edi, model
-from legion.sdk.clients.model import load_image
+from legion.toolchain.pymodel.model import load_image
 from locust import HttpLocust, task, TaskSet
 from requests.exceptions import RequestException
 

@@ -18,13 +18,14 @@ import os
 import unittest
 from legion.sdk import config
 from legion.sdk.clients.edi import build_client
-from legion.sdk.clients.model import ModelClient, load_image
+from legion.sdk.clients.model import ModelClient
+from legion.toolchain.pymodel.model import load_image
 
 
 class BasicTest(unittest.TestCase):
     def setUp(self):
-        self._client = ModelClient(config.MODEL_ID, config.MODEL_VERSION,
-                                   token=build_client().get_token(config.MODEL_ID, config.MODEL_VERSION))
+        self._client = ModelClient(config.MODEL_NAME, config.MODEL_VERSION,
+                                   token=build_client().get_token(config.MODEL_NAME, config.MODEL_VERSION))
 
     def test_nine_decode(self):
         image = load_image(os.path.join('files', 'nine.png'))

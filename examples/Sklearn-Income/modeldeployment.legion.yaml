@@ -4,4 +4,4 @@ metadata:
   name: icome-dev
 spec:
   image: nexus-local.cc.epm.kharlamov.biz:8084/legion-dev/income:1.1
-  replicas: 2
+  max_replicas: 2

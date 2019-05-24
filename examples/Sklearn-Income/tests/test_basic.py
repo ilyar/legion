@@ -23,8 +23,8 @@ import unittest2
 
 class BasicTest(unittest2.TestCase):
     def setUp(self):
-        self._client = ModelClient(config.MODEL_ID, config.MODEL_VERSION,
-                                   token=build_client().get_token(config.MODEL_ID, config.MODEL_VERSION))
+        self._client = ModelClient(config.MODEL_NAME, config.MODEL_VERSION,
+                                   token=build_client().get_token(config.MODEL_NAME, config.MODEL_VERSION))
 
     def test_model(self):
         response = self._client.invoke(**{"age": "31",

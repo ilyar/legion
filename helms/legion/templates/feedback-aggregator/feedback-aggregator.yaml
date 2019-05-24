@@ -1,21 +1,21 @@
+{{ if .Values.feedback.enabled -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: "{{ .Release.Name }}-feedback-aggregator"
   labels:
-    component: "legion-feedback-aggregator"
-    {{- include "legion.helm-labels" . | nindent 4 }}
+    {{- include "legion.helm-labels" (dict "component" "feedback-aggregator" "root" .) | nindent 4 }}
 spec:
   replicas: {{ .Values.feedback.aggregator.replicas }}
   selector:
     matchLabels:
-      component: "legion-feedback-aggregator"
-      {{- include "legion.helm-labels-for-search" . | nindent 6 }}
+      {{- include "legion.helm-labels-for-search" (dict "component" "feedback-aggregator" "root" .) | nindent 6 }}
   template:
     metadata:
+      annotations:
+        sidecar.istio.io/inject: "false"
       labels:
-        component: "legion-feedback-aggregator"
-        {{- include "legion.helm-labels" . | nindent 8 }}
+        {{- include "legion.helm-labels" (dict "component" "feedback-aggregator" "root" .) | nindent 8 }}
     spec:
       containers:
       - name: server
@@ -49,14 +49,13 @@ kind: Service
 metadata:
   name: "{{ .Release.Name }}-feedback-aggregator"
   labels:
-    component: "legion-feedback-aggregator"
-    {{- include "legion.helm-labels" . | nindent 4 }}
+    {{- include "legion.helm-labels" (dict "component" "feedback-aggregator" "root" .) | nindent 4 }}
 spec:
   selector:
-    component: "legion-feedback-aggregator"
-    {{- include "legion.helm-labels-for-search" . | nindent 4 }}
+    {{- include "legion.helm-labels-for-search" (dict "component" "feedback-aggregator" "root" .) | nindent 4 }}
   ports:
   - name: api
     targetPort: 8080
     port: {{ .Values.feedback.aggregator.port }}
     protocol: TCP
+{{- end }}

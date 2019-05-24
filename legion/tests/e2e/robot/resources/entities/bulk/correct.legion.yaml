@@ -38,4 +38,4 @@ metadata:
   name: bulk-test-md-1
 spec:
   image: nexus-local.cc.epm.kharlamov.biz:8084/legion-test/3:1
-  replicas: 1
+  max_replicas: 1

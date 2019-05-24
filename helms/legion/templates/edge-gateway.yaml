@@ -1,0 +1,31 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: edge
+  namespace: knative-serving
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+    - port:
+        number: 80
+        name: http
+        protocol: HTTP
+      hosts:
+        - {{ include "legion.ingress-domain-name" (dict "local" .Values.edge.ingress "root" . "tpl" "edge.%s") }}
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: edge
+  namespace: "{{ .Release.Namespace }}"
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+    - port:
+        number: 80
+        name: http
+        protocol: HTTP
+      hosts:
+        - {{ include "legion.ingress-domain-name" (dict "local" .Values.edge.ingress "root" . "tpl" "edge.%s") }}

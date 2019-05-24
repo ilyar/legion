@@ -62,13 +62,13 @@ func TestSendFeedbackWithoutHeader(t *testing.T) {
 	assert.Equal(t, "{\"error\":\"Request-ID header is missed\"}", w.Body.String())
 }
 
-func buildFeedbackURL(modelID, modelVersion string) string {
-	return fmt.Sprintf("/api/model/%s/%s/feedback", modelID, modelVersion)
+func buildFeedbackURL(modelName, modelVersion string) string {
+	return fmt.Sprintf("/api/model/%s/%s/feedback", modelName, modelVersion)
 }
 
-func buildMessage(modelID, modelVersion, requestID string, payload map[string]interface{}) map[string]interface{} {
+func buildMessage(modelName, modelVersion, requestID string, payload map[string]interface{}) map[string]interface{} {
 	return map[string]interface{}{
-		"model_id":      modelID,
+		"model_name":    modelName,
 		"model_version": modelVersion,
 		"payload":       payload,
 		"request_id":    requestID,
@@ -94,16 +94,16 @@ func ensureValidJSONResponse(t *testing.T, w *httptest.ResponseRecorder, expecte
 
 func TestSendFeedbackWithOnlyHeader(t *testing.T) {
 	router, mocked, tag := buildRouterWithDataMock()
-	modelID, modelVersion, requestID := "test-id", "1.0", "test-request-id"
+	modelName, modelVersion, requestID := "test-name", "1.0", "test-request-id"
 
 	expectedPayload := map[string]interface{}{}
-	expectedMessage := buildMessage(modelID, modelVersion, requestID, expectedPayload)
+	expectedMessage := buildMessage(modelName, modelVersion, requestID, expectedPayload)
 	expectedResponse := buildExpectedResponse(expectedMessage)
 
 	mocked.On("Post", tag, expectedMessage).Return(nil)
 
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("POST", buildFeedbackURL(modelID, modelVersion), nil)
+	req, _ := http.NewRequest("POST", buildFeedbackURL(modelName, modelVersion), nil)
 	req.Header.Set("Request-ID", requestID)
 	router.ServeHTTP(w, req)
 
@@ -119,7 +119,7 @@ func TestIndexRoute(t *testing.T) {
 	router.ServeHTTP(w, req)
 
 	assert.Equal(t, 200, w.Code)
-	assert.Equal(t, "{\"links\":[\"/api/model/:model_id/:model_version/feedback\"]}", w.Body.String())
+	assert.Equal(t, "{\"links\":[\"/api/model/:model_name/:model_version/feedback\"]}", w.Body.String())
 }
 
 func TestNotFoundRoute(t *testing.T) {

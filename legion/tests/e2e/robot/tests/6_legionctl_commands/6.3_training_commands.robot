@@ -1,8 +1,8 @@
 *** Variables ***
 ${LOCAL_CONFIG}         legion/config_6_3
 ${TRAINING_NAME}        test-mt
-${TRAINING_ARGS}        --id test --version 2.0
-${TRAINING_NEW_ARGS}    --id new-test --version 3.0
+${TRAINING_ARGS}        --name test --version 2.0
+${TRAINING_NEW_ARGS}    --name new-test --version 3.0
 ${TRAINING_WORKDIR}     legion/tests/e2e/models
 ${TRAINING_ENTRYPOINT}  simple.py
 ${TRAINING_VCS}         legion
@@ -108,7 +108,7 @@ Deleting of a Model Training
              Should contain   ${res.stderr}  not found
 
 Deleting of nonexistent Model Training
-    [Documentation]  The delete command must fail if a training cannot be found by id
+    [Documentation]  The delete command must fail if a training cannot be found by name
     ${res}=  Shell  legionctl --verbose mt delete ${TRAINING_NAME}
              Should not be equal  ${res.rc}  ${0}
              Should contain   ${res.stderr}  not found

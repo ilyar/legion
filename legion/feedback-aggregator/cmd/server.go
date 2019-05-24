@@ -22,7 +22,7 @@ import (
 	"os"
 	"strconv"
 
-	utils "github.com/legion-platform/legion/legion/feedback-aggregator/pkg/utils"
+	"github.com/legion-platform/legion/legion/feedback-aggregator/pkg/utils"
 )
 
 const (
@@ -42,13 +42,12 @@ func main() {
 	flag.Parse()
 
 	if len(fluentHost) == 0 || len(fluentPort) == 0 || len(fluentTag) == 0 {
-		log.Printf("Please provide values for %s / %s / %s env variables", fluentEnvHost, fluentEnvPort, fluentEnvTag)
-		return
+		log.Fatalf("Please provide values for %s / %s / %s env variables", fluentEnvHost, fluentEnvPort, fluentEnvTag)
 	}
 
 	if port, err := strconv.Atoi(fluentPort); err == nil {
 		utils.StartServer(*addr, fluentHost, port, fluentTag)
 	} else {
-		log.Printf("Cannot parse %s (%s): %s", fluentEnvPort, fluentPort, err)
+		log.Fatalf("Cannot parse %s (%s): %s", fluentEnvPort, fluentPort, err)
 	}
 }

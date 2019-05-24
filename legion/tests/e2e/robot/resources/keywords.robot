@@ -6,7 +6,7 @@ Library             String
 Library             OperatingSystem
 Library             Collections
 Library             DateTime
-Library             legion.robot.libraries.k8s.K8s  ${MODEL_TEST_ENCLAVE}
+Library             legion.robot.libraries.k8s.K8s  ${LEGION_NAMESPACE}
 Library             legion.robot.libraries.utils.Utils
 Library             legion.robot.libraries.grafana.Grafana
 Library             legion.robot.libraries.process.Process
@@ -32,17 +32,17 @@ FailedShell
     [Return]  ${res}
 
 Connect to main Grafana
-    Connect to Grafana    ${HOST_PROTOCOL}://grafana.${HOST_BASE_DOMAIN}  ${GRAFANA_USER}  ${GRAFANA_PASSWORD}
+    Connect to Grafana    ${GRAFANA_URL}  ${GRAFANA_USER}  ${GRAFANA_PASSWORD}
 
 Build stub model
-    [Arguments]  ${model_id}  ${model_version}  ${model_image_key_name}=\${TEST_MODEL_IMAGE}
+    [Arguments]  ${model_name}  ${model_version}  ${model_image_key_name}=\${TEST_MODEL_IMAGE}
 
-    Delete stub model training  ${model_id}  ${model_version}
-    Wait Until Keyword Succeeds  2m  5 sec  Create stub model training  ${model_id}  ${model_version}
+    Delete stub model training  ${model_name}  ${model_version}
+    Wait Until Keyword Succeeds  2m  5 sec  Create stub model training  ${model_name}  ${model_version}
 
-    Wait stub model training  ${model_id}  ${model_version}
+    Wait stub model training  ${model_name}  ${model_version}
 
-    ${model_build_status}=  Get stub model training status  ${model_id}  ${model_version}
+    ${model_build_status}=  Get stub model training status  ${model_name}  ${model_version}
     ${model_image}=  Get From Dictionary  ${model_build_status}  modelImage
 
     Set Suite Variable  ${model_image_key_name}  ${model_image}
@@ -57,31 +57,7 @@ Run EDI inspect enclave and check result
 
 Run EDI inspect
     [Documentation]  run legionctl 'md get', logs result and return dict with return code and output
-    ${result}=            Run Process without PIPE   legionctl --verbose md get --edi ${HOST_PROTOCOL}://edi-${MODEL_TEST_ENCLAVE}.${HOST_BASE_DOMAIN} --token "${DEX_TOKEN}"    shell=True
-    Log                   stdout = ${result.stdout}
-    Log                   stderr = ${result.stderr}
-    [Return]              ${result}
-
-Run EDI inspect by model id
-    [Documentation]  run legionctl 'md get', logs result and return dict with return code and output
-    [Arguments]           ${model_id}
-    ${result}=            Run Process without PIPE   legionctl --verbose inspect --model-id ${model_id} --format column --edi ${HOST_PROTOCOL}://edi-${enclave}.${HOST_BASE_DOMAIN} --token "${DEX_TOKEN}"    shell=True
-    Log                   stdout = ${result.stdout}
-    Log                   stderr = ${result.stderr}
-    [Return]              ${result}
-
-Run EDI inspect by model version
-    [Documentation]  run legionctl 'md get', logs result and return dict with return code and output
-    [Arguments]           ${enclave}    ${model_ver}
-    ${result}=            Run Process without PIPE   legionctl --verbose inspect --model-version ${model_ver} --format column --edi ${HOST_PROTOCOL}://edi-${enclave}.${HOST_BASE_DOMAIN} --token "${DEX_TOKEN}"    shell=True
-    Log                   stdout = ${result.stdout}
-    Log                   stderr = ${result.stderr}
-    [Return]              ${result}
-
-Run EDI inspect by model id and model version
-    [Documentation]  run legionctl 'md get', logs result and return dict with return code and output
-    [Arguments]           ${enclave}    ${model_id}     ${model_ver}
-    ${result}=            Run Process without PIPE   legionctl --verbose inspect --model-id ${model_id} --model-version ${model_ver} --format column --edi ${HOST_PROTOCOL}://edi-${enclave}.${HOST_BASE_DOMAIN} --token "${DEX_TOKEN}"    shell=True
+    ${result}=            Run Process without PIPE   legionctl --verbose md get --edi ${EDI_URL} --token "${DEX_TOKEN}"    shell=True
     Log                   stdout = ${result.stdout}
     Log                   stderr = ${result.stderr}
     [Return]              ${result}
@@ -93,10 +69,10 @@ Run EDI inspect with parse
     Log                   ${parsed}
     [Return]              ${parsed}
 
-Run EDI inspect with parse by model id
+Run EDI inspect with parse by model name
     [Documentation]  get parsed inspect result for validation and logs it
-    [Arguments]           ${model_id}
-    ${edi_state} =        Shell  legionctl --verbose md get --model-id ${model_id}
+    [Arguments]           ${model_name}
+    ${edi_state} =        Shell  legionctl --verbose md get --model-id ${model_name}
     ${parsed} =           Parse edi inspect columns info                 ${edi_state.stdout}
     Log                   ${parsed}
     [Return]              ${parsed}
@@ -119,18 +95,19 @@ Run EDI deploy with scale
     [Return]              ${result}
 
 Run EDI deploy and check model started
-    [Arguments]           ${name}     ${image}      ${model_id}   ${model_ver}
+    [Arguments]           ${name}     ${image}      ${model_name}   ${model_ver}
     Log  ${DEX_TOKEN}
     ${edi_state}=   Shell  legionctl --verbose md create ${name} --image ${image}
     Should Be Equal As Integers          ${edi_state.rc}         0
-    ${response}=    Wait Until Keyword Succeeds  1m  0 sec  Check model started  ${model_id}             ${model_ver}
+    ${response}=    Wait Until Keyword Succeeds  1m  0 sec  Check model started  ${name}
+    Should contain                       ${response}             'model_name': '${model_name}'
     Should contain                       ${response}             'model_version': '${model_ver}'
 
     # --------- UNDEPLOY COMMAND SECTION -----------
 Run EDI undeploy by model version and check
     [Timeout]       2 min
-    [Arguments]           ${model_id}    ${model_version}    ${model_image}
-    ${resp_dict}=                Shell  legionctl --verbose md delete --model-id ${model_id} --model-verson ${model_version}
+    [Arguments]           ${model_name}    ${model_version}    ${model_image}
+    ${resp_dict}=                Shell  legionctl --verbose md delete --model-id ${model_name} --model-verson ${model_version}
     Should Be Equal As Integers  ${resp_dict.rc}        0
     ${resp_dict} =               Shell  legionctl --verbose md get
     Should Be Equal As Integers  ${resp_dict.rc}        0
@@ -145,8 +122,8 @@ Run EDI undeploy model without version and check
     Should not contain           ${edi_state.stdout}    ${md_name}
 
 Run EDI undeploy with version
-    [Arguments]           ${enclave}    ${model_id}  ${model_version}
-    ${result}=            Run Process without PIPE   legionctl --verbose undeploy ${model_id} --model-version ${model_version} --ignore-not-found --edi ${HOST_PROTOCOL}://edi-${enclave}.${HOST_BASE_DOMAIN} --token "${DEX_TOKEN}"     shell=True
+    [Arguments]           ${enclave}    ${model_name}  ${model_version}
+    ${result}=            Run Process without PIPE   legionctl --verbose undeploy ${model_name} --model-version ${model_version} --ignore-not-found --edi ${EDI_HOST} --token "${DEX_TOKEN}"     shell=True
     Log                   stdout = ${result.stdout}
     Log                   stderr = ${result.stderr}
     [Return]              ${result}
@@ -154,37 +131,33 @@ Run EDI undeploy with version
     # --------- SCALE COMMAND SECTION -----------
 Run EDI scale
     [Documentation]  run legionctl 'scale command', logs result and return dict with return code and output(for exceptions)
-    [Arguments]           ${enclave}    ${model_id}     ${new_scale}
-    ${result}=            Run Process without PIPE   legionctl --verbose scale ${model_id} ${new_scale} --edi ${HOST_PROTOCOL}://edi-${enclave}.${HOST_BASE_DOMAIN} --token "${DEX_TOKEN}"   shell=True
+    [Arguments]           ${enclave}    ${model_name}     ${new_scale}
+    ${result}=            Run Process without PIPE   legionctl --verbose scale ${model_name} ${new_scale} --edi ${EDI_HOST} --token "${DEX_TOKEN}"   shell=True
     Log                   stdout = ${result.stdout}
     Log                   stderr = ${result.stderr}
     [Return]              ${result}
 
 Run EDI scale with version
     [Documentation]  run legionctl 'scale command', logs result and return dict with return code and output(for exceptions)
-    [Arguments]           ${enclave}    ${model_id}     ${new_scale}    ${model_ver}
-    ${result}=            Run Process without PIPE   legionctl --verbose scale ${model_id} ${new_scale} --model-version ${model_ver} --edi ${HOST_PROTOCOL}://edi-${enclave}.${HOST_BASE_DOMAIN} --token "${DEX_TOKEN}"    shell=True
+    [Arguments]           ${enclave}    ${model_name}     ${new_scale}    ${model_ver}
+    ${result}=            Run Process without PIPE   legionctl --verbose scale ${model_name} ${new_scale} --model-version ${model_ver} --edi ${EDI_HOST} --token "${DEX_TOKEN}"    shell=True
     Log                   stdout = ${result.stdout}
     Log                   stderr = ${result.stderr}
     [Return]              ${result}
 
-    # --------- OTHER KEYWORDS SECTION -----------
-Build enclave EDGE URL
-    [Documentation]  build enclave EDGE URL
-    [Arguments]           ${enclave}
-    [Return]              ${HOST_PROTOCOL}://edge-${enclave}.${HOST_BASE_DOMAIN}
+# --------- OTHER KEYWORDS SECTION -----------
 
 Get token from EDI
     [Documentation]  get token from EDI for the EDGE session
-    [Arguments]           ${model_id}    ${model_version}
-    ${resp} =             Shell  legionctl generate-token --model-id ${model_id} --model-version ${model_version}
+    [Arguments]           ${md_name}
+    ${resp} =             Shell  legionctl generate-token --md ${md_name}
     Should be equal as integers       ${resp.rc}  0
     Set Suite Variable    ${TOKEN}   ${resp.stdout}
 
 Check model started
     [Documentation]  check if model run in container by http request
-    [Arguments]           ${model_id}  ${model_version}
-    ${resp}=              Shell  legionctl --verbose model info --model-id ${model_id} --model-version ${model_version}
+    [Arguments]           ${md_name}
+    ${resp}=              Shell  legionctl --verbose model info --md ${md_name}
     Should be equal       ${resp.rc}  ${0}
     Log                   ${resp.stdout}
     Should not be empty   ${resp.stdout}
@@ -192,16 +165,16 @@ Check model started
 
 Invoke deployed model
     [Documentation]  call model invoke endpoint
-    [Arguments]           ${enclave}   ${model_id}  ${model_ver}  ${request_id}=None  ${endpoint}=default  &{arguments}
+    [Arguments]           ${enclave}   ${model_name}  ${model_ver}  ${request_id}=None  ${endpoint}=default  &{arguments}
     ${edge}=              Build enclave EDGE URL    ${enclave}
-    ${resp}=              Invoke model API  ${model_id}  ${model_ver}  ${edge}  ${TOKEN}  ${endpoint}  ${request_id}  &{arguments}
+    ${resp}=              Invoke model API  ${model_name}  ${model_ver}  ${edge}  ${TOKEN}  ${endpoint}  ${request_id}  &{arguments}
     [Return]              ${resp}
 
 Send feedback for deployed model
     [Documentation]  call model feedback endpoint
-    [Arguments]           ${enclave}   ${model_id}  ${model_ver}  ${request_id}  &{arguments}
+    [Arguments]           ${enclave}   ${model_name}  ${model_ver}  ${request_id}  &{arguments}
     ${edge}=              Build enclave EDGE URL    ${enclave}
-    ${resp}=              Invoke model feedback  ${model_id}  ${model_ver}  ${edge}  ${TOKEN}  ${request_id}  &{arguments}
+    ${resp}=              Invoke model feedback  ${model_name}  ${model_ver}  ${edge}  ${TOKEN}  ${request_id}  &{arguments}
     [Return]              ${resp}
 
 Validate model API meta log entry
@@ -216,7 +189,7 @@ Validate model API meta log entry
     Dictionary Should Contain Key   ${log_entry}  response_http_headers
     Dictionary Should Contain Key   ${log_entry}  response_body_chunk_count
     Dictionary Should Contain Key   ${log_entry}  response_status
-    Dictionary Should Contain Key   ${log_entry}  model_id
+    Dictionary Should Contain Key   ${log_entry}  model_name
     Dictionary Should Contain Key   ${log_entry}  model_version
 
 Validate model API meta log entry Request ID
@@ -239,10 +212,10 @@ Validate model API meta log entry POST arguments
 
 Validate model API meta ID and version
     [Documentation]  check that model API ID and version is correct
-    [Arguments]      ${log_entry}   ${excpected_model_id}   ${excpected_model_version}
-    ${actual_model_id}=            Get From Dictionary       ${log_entry}     model_id
+    [Arguments]      ${log_entry}   ${excpected_model_name}   ${excpected_model_version}
+    ${actual_model_name}=            Get From Dictionary       ${log_entry}     model_name
     ${actual_model_version}=       Get From Dictionary       ${log_entry}     model_version
-    Should Be Equal                ${actual_model_id}        ${excpected_model_id}
+    Should Be Equal                ${actual_model_name}        ${excpected_model_name}
     Should Be Equal                ${actual_model_version}   ${excpected_model_version}
 
 Get count of invocation chunks from model API meta log entry response
@@ -262,7 +235,7 @@ Validate model API body log entry
     Dictionary Should Contain Key   ${log_entry}  request_id
     Dictionary Should Contain Key   ${log_entry}  response_chunk_id
     Dictionary Should Contain Key   ${log_entry}  response_content
-    Dictionary Should Contain Key   ${log_entry}  model_id
+    Dictionary Should Contain Key   ${log_entry}  model_name
     Dictionary Should Contain Key   ${log_entry}  model_version
 
 Validate model API body log entry for all entries
@@ -285,7 +258,7 @@ Validate model feedback log entry
     [Arguments]      ${log_entry}
     Dictionary Should Contain Key   ${log_entry}  request_id
     Dictionary Should Contain Key   ${log_entry}  payload
-    Dictionary Should Contain Key   ${log_entry}  model_id
+    Dictionary Should Contain Key   ${log_entry}  model_name
     Dictionary Should Contain Key   ${log_entry}  model_version
 
 Validate model feedback log entry Request ID
@@ -303,10 +276,10 @@ Validate model feedback log entry params
 
 Validate model feedback ID and version
     [Documentation]  check that model feedback ID and version is correct
-    [Arguments]      ${log_entry}   ${excpected_model_id}   ${excpected_model_version}
-    ${actual_model_id}=            Get From Dictionary       ${log_entry}     model_id
+    [Arguments]      ${log_entry}   ${excpected_model_name}   ${excpected_model_version}
+    ${actual_model_name}=            Get From Dictionary       ${log_entry}     model_name
     ${actual_model_version}=       Get From Dictionary       ${log_entry}     model_version
-    Should Be Equal                ${actual_model_id}        ${excpected_model_id}
+    Should Be Equal                ${actual_model_name}        ${excpected_model_name}
     Should Be Equal                ${actual_model_version}   ${excpected_model_version}
 
 Verify model info from edi
@@ -314,11 +287,6 @@ Verify model info from edi
     Should Be Equal  ${target_model[0]}    ${model_name}        invalid model name
     Should Be Equal  ${target_model[1]}    ${model_state}       invalid model state
     Should Be Equal  ${target_model[2]}    ${model_replicas}    invalid model replicas
-
-Check if all enclave domains are registered
-    [Arguments]             ${enclave}
-    :FOR    ${enclave_subdomain}    IN    @{ENCLAVE_SUBDOMAINS}
-    \   Check domain exists  ${enclave_subdomain}-${enclave}.${HOST_BASE_DOMAIN}
 
 Get cluster nodes and their count
     [Arguments]    ${is_before}
@@ -364,7 +332,7 @@ Secured component domain should be accessible by valid credentials
     Should not contain   ${auth_page}    Invalid Email Address and password
 
 Login to the edi and edge
-    ${res}=  Shell  legionctl --verbose login --edi ${HOST_PROTOCOL}://edi-${MODEL_TEST_ENCLAVE}.${HOST_BASE_DOMAIN} --token "${DEX_TOKEN}"
+    ${res}=  Shell  legionctl --verbose login --edi ${EDI_URL} --token "${DEX_TOKEN}"
     Should be equal  ${res.rc}  ${0}
-    ${res}=  Shell  legionctl config set MODEL_SERVER_URL ${HOST_PROTOCOL}://edge-${MODEL_TEST_ENCLAVE}.${HOST_BASE_DOMAIN}
+    ${res}=  Shell  legionctl config set MODEL_SERVER_URL ${EDGE_URL}
     Should be equal  ${res.rc}  ${0}

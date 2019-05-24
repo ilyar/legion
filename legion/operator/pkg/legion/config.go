@@ -52,6 +52,9 @@ const (
 	MutatingWebhookName    = "MUTATING_WEBHOOK_NAME"
 	ValidatingWebhookName  = "VALIDATING_WEBHOOK_NAME"
 	LogFlushSize           = "LOG_FLUSH_SIZE"
+	PrometheusMetricsPort  = "PROMETHEUS_METRICS_PORT"
+	EdgeHost               = "EDGE_HOST"
+	FeedbackEnabled        = "FEEDBACK_ENABLED"
 )
 
 // TODO:
@@ -71,11 +74,12 @@ func SetUpBuilderConfig() {
 }
 
 func SetUpOperatorConfig() {
+	viper.SetConfigName("operator")
+
 	setNotEmptyParam(BuilderImage)
 	setNotEmptyParam(MetricHost)
 	setNotEmptyParam(MetricPort)
 	setNotEmptyParam(MetricEnabled)
-	setNotEmptyParam(PythonToolchainImage)
 	setNotEmptyParam(DockerRegistry)
 
 	viper.SetDefault(ImagePrefix, "legion")
@@ -87,7 +91,26 @@ func SetUpOperatorConfig() {
 	panicIfError(viper.BindEnv(DockerRegistryUser))
 	panicIfError(viper.BindEnv(DockerRegistryPassword))
 
-	viper.SetDefault(Namespace, "default")
+	viper.SetDefault(Namespace, "legion")
+	panicIfError(viper.BindEnv(Namespace))
+
+	viper.SetDefault(PrometheusMetricsPort, 7777)
+	panicIfError(viper.BindEnv(PrometheusMetricsPort))
+
+	viper.SetDefault(PrometheusMetricsPort, 7777)
+	panicIfError(viper.BindEnv(PrometheusMetricsPort))
+
+	viper.SetDefault(EdgeHost, "https://edge.legion-test.epm.kharlamov.biz")
+	panicIfError(viper.BindEnv(EdgeHost))
+
+	viper.SetDefault(FeedbackEnabled, false)
+	panicIfError(viper.BindEnv(FeedbackEnabled))
+}
+
+func SetUpWebhookConfig() {
+	setNotEmptyParam(PythonToolchainImage)
+
+	viper.SetDefault(Namespace, ";legion")
 	panicIfError(viper.BindEnv(Namespace))
 
 	viper.SetDefault(WebhookSecretName, "webhook-server-secret")
@@ -101,10 +124,13 @@ func SetUpOperatorConfig() {
 
 	viper.SetDefault(MutatingWebhookName, "legion-mutating-webhook-configuration")
 	viper.SetDefault(ValidatingWebhookName, "legion-validating-webhook-configuration")
+
+	viper.SetDefault(PrometheusMetricsPort, 7777)
+	panicIfError(viper.BindEnv(PrometheusMetricsPort))
 }
 
 func SetUpEDIConfig() {
-	viper.SetDefault(Namespace, "default")
+	viper.SetDefault(Namespace, "legion")
 	panicIfError(viper.BindEnv(Namespace))
 
 	viper.SetDefault(JwtTtlMinutes, 120)

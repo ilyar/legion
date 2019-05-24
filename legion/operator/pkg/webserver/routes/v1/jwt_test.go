@@ -28,8 +28,7 @@ import (
 )
 
 const (
-	testModelID      = "test-model-id"
-	testModelVersion = "test-model-version"
+	testModelDeploymentName = "test-model-deployment-name"
 )
 
 func TestGenerateTokenWithoutExpirationDate(t *testing.T) {
@@ -38,7 +37,7 @@ func TestGenerateTokenWithoutExpirationDate(t *testing.T) {
 
 	viper.Set(legion.JwtSecret, "some-secret")
 
-	tokenRequest := &TokenRequest{ModelID: testModelID, ModelVersion: testModelVersion}
+	tokenRequest := &TokenRequest{ModelDeploymentName: testModelDeploymentName}
 	tokenRequestBody, err := json.Marshal(tokenRequest)
 	g.Expect(err).NotTo(HaveOccurred())
 
@@ -61,7 +60,7 @@ func TestDisabledJWT(t *testing.T) {
 
 	viper.Set(legion.JwtSecret, "")
 
-	tokenRequest := &TokenRequest{ModelID: testModelID, ModelVersion: testModelVersion}
+	tokenRequest := &TokenRequest{ModelDeploymentName: testModelDeploymentName}
 	tokenRequestBody, err := json.Marshal(tokenRequest)
 	g.Expect(err).NotTo(HaveOccurred())
 

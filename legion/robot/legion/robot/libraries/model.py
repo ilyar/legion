@@ -33,11 +33,11 @@ class Model:
         self._last_response = None
 
     @staticmethod
-    def get_model_info(edge, token, model_id, model_version=None):
+    def get_model_info(edge, token, model_name, model_version=None):
         """
         Invoke model through API
 
-        :param model_id: model ID
+        :param model_name: model name
         :param model_version: model version
         :param edge: edge url
         :param token: model API JWT token
@@ -45,9 +45,9 @@ class Model:
         """
         headers = {"Authorization": "Bearer {}".format(token)}
         if model_version:
-            url = '{}/api/model/{}/{}/info'.format(edge, model_id, model_version)
+            url = '{}/api/model/{}/{}/info'.format(edge, model_name, model_version)
         else:
-            url = '{}/api/model/{}/info'.format(edge, model_id)
+            url = '{}/api/model/{}/info'.format(edge, model_name)
 
         print('Requesting {} in GET mode'.format(url))
 
@@ -61,11 +61,11 @@ class Model:
 
         return response.json()
 
-    def invoke_model_feedback(self, model_id, model_version, edge, token, request_id, **payload):
+    def invoke_model_feedback(self, model_name, model_version, edge, token, request_id, **payload):
         """
         Invoke model through API
 
-        :param model_id: model ID
+        :param model_name: model name
         :param model_version: model version
         :param edge: edge url
         :param token: model API JWT token
@@ -78,7 +78,7 @@ class Model:
             'Request-ID': request_id
         }
 
-        url = '{}/api/model/{}/{}/feedback'.format(edge, model_id, model_version)
+        url = '{}/api/model/{}/{}/feedback'.format(edge, model_name, model_version)
 
         print('Requesting {} with data = {} in POST mode'.format(url, payload))
 
@@ -93,11 +93,11 @@ class Model:
 
         return response.json()
 
-    def invoke_model_api(self, model_id, model_version, edge, token, endpoint, request_id=None, **payload):
+    def invoke_model_api(self, model_name, model_version, edge, token, endpoint, request_id=None, **payload):
         """
         Invoke model through API
 
-        :param model_id: model ID
+        :param model_name: model name
         :param model_version: model version
         :param edge: edge url
         :param token: model API JWT token
@@ -113,7 +113,7 @@ class Model:
         if request_id:
             headers['Request-ID'] = request_id
 
-        url = '{}/api/model/{}/{}/invoke/{}'.format(edge, model_id, model_version, endpoint)
+        url = '{}/api/model/{}/{}/invoke/{}'.format(edge, model_name, model_version, endpoint)
 
         print('Requesting {} with data = {} in POST mode'.format(url, payload))
 
@@ -146,12 +146,12 @@ class Model:
         """
         return self._last_response_id
 
-    def ensure_model_api_call_result_field_is_correct(self, model_id, model_version, edge, token, endpoint,
+    def ensure_model_api_call_result_field_is_correct(self, model_name, model_version, edge, token, endpoint,
                                                       result_field, desired_value, **payload):
         """
         Get model properties through model API
 
-        :param model_id: model ID
+        :param model_name: model name
         :param model_version: model version
         :param edge: edge url
         :param token: model API JWT token
@@ -162,7 +162,7 @@ class Model:
         :return: None
         """
         def check():
-            result = self.invoke_model_api(model_id, model_version, edge, token, endpoint, None, **payload)
+            result = self.invoke_model_api(model_name, model_version, edge, token, endpoint, None, **payload)
             actual_value = result.get(result_field)
             print('Got result of invocation: actual value = {!r}, desired value = {!r}'
                   .format(actual_value, desired_value))

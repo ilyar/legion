@@ -17,21 +17,19 @@
 package utils
 
 import (
+	"github.com/legion-platform/legion/legion/feedback-aggregator/pkg/feedback"
 	"log"
 
 	"github.com/fluent/fluent-logger-golang/fluent"
-	gin "github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin"
 )
 
-const uriFormat = "/api/model/:model_id/:model_version/feedback"
-const requestIDHeader = "Request-ID"
-const maxRetryToDeliver = 5
-const dataLoggingInstance = "dataLoggingInstance"
-const dataLoggingTag = "dataLoggingTag"
-
-type dataLogging interface {
-	Post(tag string, message interface{}) error
-}
+const (
+	uriFormat           = "/feedback/api/model/:model_name/:model_version"
+	maxRetryToDeliver   = 5
+	dataLoggingInstance = "dataLoggingInstance"
+	dataLoggingTag      = "dataLoggingTag"
+)
 
 func attachRoutes(router *gin.Engine) {
 	router.GET("/", handleIndex)
@@ -40,7 +38,7 @@ func attachRoutes(router *gin.Engine) {
 }
 
 // DataLoggingMiddleware adds dataLoggingInstance and dataLoggingTag contexts to request
-func DataLoggingMiddleware(instance dataLogging, loggerTag string) gin.HandlerFunc {
+func DataLoggingMiddleware(instance feedback.DataLogging, loggerTag string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		log.Println("Setting middleware DataLogging")
 		c.Set(dataLoggingInstance, instance)

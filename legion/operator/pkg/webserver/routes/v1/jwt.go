@@ -33,10 +33,8 @@ const (
 )
 
 type TokenRequest struct {
-	// Model id
-	ModelID string `json:"model_id"`
-	// Model version
-	ModelVersion string `json:"model_version"`
+	// Model Deployment name
+	ModelDeploymentName string `json:"md_name"`
 	// Explicitly set expiration date for token
 	ExpirationDate string `json:"expiration_date,omitempty"`
 }
@@ -68,13 +66,8 @@ func generateToken(c *gin.Context) {
 		return
 	}
 
-	if tokenRequest.ModelVersion == "" {
-		routes.AbortWithError(c, 500, "Requested field model_version is not set")
-		return
-	}
-
-	if tokenRequest.ModelID == "" {
-		routes.AbortWithError(c, 500, "Requested field model_id is not set")
+	if tokenRequest.ModelDeploymentName == "" {
+		routes.AbortWithError(c, 500, "Requested field md_name is not set")
 		return
 	}
 
@@ -85,7 +78,7 @@ func generateToken(c *gin.Context) {
 	}
 
 	token, err := utils.GenerateModelToken(
-		tokenRequest.ModelID, tokenRequest.ModelVersion, unixExpirationDate,
+		tokenRequest.ModelDeploymentName, unixExpirationDate,
 	)
 	if err != nil {
 		logToken.Error(err, "Token generation")

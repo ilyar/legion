@@ -23,8 +23,8 @@ from legion.sdk import config
 
 class BasicTest(unittest.TestCase):
     def setUp(self):
-        self._client = ModelClient(config.MODEL_ID, config.MODEL_VERSION,
-                                   token=build_client().get_token(config.MODEL_ID, config.MODEL_VERSION))
+        self._client = ModelClient(config.MODEL_NAME, config.MODEL_VERSION,
+                                   token=build_client().get_token(config.MODEL_NAME, config.MODEL_VERSION))
 
     def test_random_sum(self):
         a = random.randint(0, 100)
