@@ -4,6 +4,8 @@ apiVersion: legion.legion-platform.org/v1alpha1
 kind: VCSCredential
 metadata:
   name: "{{ $vcs.name }}"
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
   labels:
     {{- include "legion.helm-labels" $ | nindent 4 }}
 spec:
