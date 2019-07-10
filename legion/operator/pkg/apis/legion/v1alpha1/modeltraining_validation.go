@@ -17,7 +17,8 @@ import (
 var logMT = logf.Log.WithName("model_training")
 
 const (
-	mtVcsNotExistsErrorMessage = "Cannot find VCS Credential"
+	mtVcsNotExistsErrorMessage  = "Cannot find VCS Credential"
+	emptyExperimentErrorMessage = "experiment must be not empty value"
 )
 
 var (
@@ -48,14 +49,15 @@ func (mt *ModelTraining) ValidatesAndSetDefaults(k8sClient client.Client) (err e
 	}
 
 	if len(mt.Spec.Image) == 0 {
-		modelImage, toolchainErr := legion.GetToolchainImage(mt.Spec.ToolchainType)
+		toolchainName := k8stypes.NamespacedName{Name: mt.Spec.Toolchain, Namespace: viper.GetString(legion.Namespace)}
+		toolchain := &ToolchainIntegration{}
 
-		if toolchainErr != nil {
-			err = multierr.Append(err, toolchainErr)
+		if k8sErr := k8sClient.Get(context.TODO(), toolchainName, toolchain); k8sErr != nil {
+			err = multierr.Append(err, k8sErr)
 		} else {
 			logMT.Info("Toolchain image parameter is nil. Set the default value",
-				"name", mt.Name, "image", modelImage)
-			mt.Spec.Image = modelImage
+				"name", mt.Name, "image", toolchain.Spec.DefaultImage)
+			mt.Spec.Image = toolchain.Spec.DefaultImage
 		}
 	}
 
@@ -82,6 +84,26 @@ func (mt *ModelTraining) ValidatesAndSetDefaults(k8sClient client.Client) (err e
 			mt.Spec.Reference = vcsCR.Spec.DefaultReference
 		}
 	}
+
+	if len(mt.Spec.Experiment) == 0 {
+		err = multierr.Append(err, errors.New(emptyExperimentErrorMessage))
+	}
+
+	// TODO: !!!
+	//for _, dbd := range mt.Spec.Data {
+	//	if dbd.DataBindingName != nil && dbd.Da
+	//
+	//	toolchainName := k8stypes.NamespacedName{Name: mt.Spec.Toolchain, Namespace: viper.GetString(legion.Namespace)}
+	//	toolchain := &ToolchainIntegration{}
+	//
+	//	if k8sErr := k8sClient.Get(context.TODO(), toolchainName, toolchain); k8sErr != nil {
+	//		err = multierr.Append(err, k8sErr)
+	//	} else {
+	//		logMT.Info("Toolchain image parameter is nil. Set the default value",
+	//			"name", mt.Name, "image", toolchain.Spec.DefaultImage)
+	//		mt.Spec.Image = toolchain.Spec.DefaultImage
+	//	}
+	//}
 
 	return
 }

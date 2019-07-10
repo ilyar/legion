@@ -105,6 +105,30 @@ definitions:
         description: VCS specification. It is the same as VCSCredential CRD specification
         type: object
     type: object
+  v1alpha1.DataBindingDir:
+    properties:
+      dataBinding:
+        $ref: '#/definitions/v1alpha1.DataBindingSpec'
+        type: object
+      dir:
+        type: string
+      name:
+        type: string
+    type: object
+  v1alpha1.DataBindingSpec:
+    properties:
+      region:
+        description: blabla
+        type: string
+      type:
+        description: |-
+          blabla
+          +kubebuilder:validation:Enum=s3
+        type: string
+      uri:
+        description: blabla
+        type: string
+    type: object
   v1alpha1.ModelDeploymentSpec:
     properties:
       annotations:
@@ -208,6 +232,11 @@ definitions:
         items:
           type: string
         type: array
+      data:
+        description: blabla
+        items:
+          $ref: '#/definitions/v1alpha1.DataBindingDir'
+        type: array
       entrypoint:
         description: Model training file. It can be python\bash script or jupiter
           notebook
@@ -217,6 +246,9 @@ definitions:
           Custom environment variables that should be setted before entrypoint invocation.
           In ENVname:value format
         type: object
+      experiment:
+        description: blablabla
+        type: string
       hyperparameters:
         description: Model training hyperparameters in parameter:value format
         type: object
@@ -235,9 +267,7 @@ definitions:
           The same format like k8s uses for pod resources.
         type: string
       toolchain:
-        description: |-
-          Type of toolchain. Currently supports only python.
-          +kubebuilder:validation:Enum=python,jupyter
+        description: Type of toolchain. Currently supports only python.
         type: string
       vcsName:
         description: Name of VCSCredential resource. Must exists

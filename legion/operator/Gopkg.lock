@@ -59,6 +59,52 @@
   revision = "3e73c27b9ace51f94ca75c118cd0b6ea529237b4"
 
 [[projects]]
+  digest = "1:09e622544ae8d67faa62464332d558cb1276fd410b9f3740b2585c984abb500a"
+  name = "github.com/aws/aws-sdk-go"
+  packages = [
+    "aws",
+    "aws/awserr",
+    "aws/awsutil",
+    "aws/client",
+    "aws/client/metadata",
+    "aws/corehandlers",
+    "aws/credentials",
+    "aws/credentials/ec2rolecreds",
+    "aws/credentials/endpointcreds",
+    "aws/credentials/processcreds",
+    "aws/credentials/stscreds",
+    "aws/csm",
+    "aws/defaults",
+    "aws/ec2metadata",
+    "aws/endpoints",
+    "aws/request",
+    "aws/session",
+    "aws/signer/v4",
+    "internal/ini",
+    "internal/s3err",
+    "internal/sdkio",
+    "internal/sdkrand",
+    "internal/sdkuri",
+    "internal/shareddefaults",
+    "private/protocol",
+    "private/protocol/eventstream",
+    "private/protocol/eventstream/eventstreamapi",
+    "private/protocol/json/jsonutil",
+    "private/protocol/query",
+    "private/protocol/query/queryutil",
+    "private/protocol/rest",
+    "private/protocol/restxml",
+    "private/protocol/xml/xmlutil",
+    "service/s3",
+    "service/s3/s3iface",
+    "service/s3/s3manager",
+    "service/sts",
+  ]
+  pruneopts = "T"
+  revision = "454a8537c0d6de965091d33ab849505d7ebc3c68"
+  version = "v1.20.16"
+
+[[projects]]
   branch = "master"
   digest = "1:ad4589ec239820ee99eb01c1ad47ebc5f8e02c4f5103a9b210adff9696d89f36"
   name = "github.com/beorn7/perks"
@@ -391,6 +437,13 @@
   packages = ["io"]
   pruneopts = "T"
   revision = "d14ea06fba99483203c19d92cfcd13ebe73135f4"
+
+[[projects]]
+  digest = "1:b3f2dea8fe8eadb5833f7c8a2ef35dae07308bf7a4d0fee7f37774314e1964d3"
+  name = "github.com/jmespath/go-jmespath"
+  packages = ["."]
+  pruneopts = "T"
+  revision = "c2b33e84"
 
 [[projects]]
   digest = "1:ee5840274624ad20cac08227aeca582fbdaf3727ef9dd37ae935706240679e09"
@@ -1566,10 +1619,15 @@
     "github.com/aspenmesh/istio-client-go/pkg/apis/authentication/v1alpha1",
     "github.com/aspenmesh/istio-client-go/pkg/apis/networking/v1alpha3",
     "github.com/aspenmesh/istio-client-go/pkg/client/clientset/versioned/scheme",
+    "github.com/aws/aws-sdk-go/aws",
+    "github.com/aws/aws-sdk-go/aws/session",
+    "github.com/aws/aws-sdk-go/service/s3",
+    "github.com/aws/aws-sdk-go/service/s3/s3manager",
     "github.com/dgrijalva/jwt-go",
     "github.com/emicklei/go-restful",
     "github.com/gin-gonic/gin",
     "github.com/gogo/protobuf/types",
+    "github.com/hpcloud/tail",
     "github.com/knative/serving/pkg/apis/serving/v1alpha1",
     "github.com/knative/serving/pkg/apis/serving/v1beta1",
     "github.com/lestrrat-go/jwx/jwk",

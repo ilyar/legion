@@ -48,11 +48,6 @@ const (
 
 var log = logf.Log.WithName(controllerName)
 
-/**
-* USER ACTION REQUIRED: This is a scaffold file intended for the user to modify with their own Controller
-* business logic.  Delete these comments after modifying this file.*
- */
-
 // Add creates a new ModelTraining Controller and adds it to the Manager with default RBAC. The Manager will set fields on the Controller
 // and Start it when the Manager is Started.
 func Add(mgr manager.Manager) error {
@@ -125,6 +120,7 @@ const (
 	gitSecretVolumeName    = "git-secrets"
 	gitSecretPath          = "/home/root/.ssh"
 	sharedDirPath          = "/var/legion"
+	outputDirPath          = "/var/legion/_internal_output"
 	sharedDirName          = "shared-dir"
 	modelContainerName     = "model"
 	dockerSocketVolumeName = "docker-socket"
@@ -151,6 +147,117 @@ func (r *ReconcileModelTraining) findVCSInstance(vcsName string, namespace strin
 	return
 }
 
+func (r *ReconcileModelTraining) generateBuilderEnvs(modelBuilderCR *legionv1alpha1.ModelTraining, vcsInstance *legionv1alpha1.VCSCredential) ([]corev1.EnvVar, error) {
+	builderEnvSet := []corev1.EnvVar{
+		{
+			Name: legion.PodName,
+			ValueFrom: &corev1.EnvVarSource{
+				FieldRef: &corev1.ObjectFieldSelector{
+					FieldPath: "metadata.name",
+				},
+			},
+		},
+		{
+			Name: legion.Namespace,
+			ValueFrom: &corev1.EnvVarSource{
+				FieldRef: &corev1.ObjectFieldSelector{
+					FieldPath: "metadata.namespace",
+				},
+			},
+		},
+		{
+			Name:  legion.RepositoryURL,
+			Value: vcsInstance.Spec.Uri,
+		},
+		{
+			Name:  legion.SharedDirPath,
+			Value: sharedDirPath,
+		},
+		{
+			Name:  legion.OutputTrainingDir,
+			Value: outputDirPath,
+		},
+		{
+			Name:  legion.Reference,
+			Value: modelBuilderCR.Spec.Reference,
+		},
+		{
+			Name:  legion.GitSSHKeyPath,
+			Value: fmt.Sprintf("%s/%s", gitSecretPath, utils.GitSSHKeyFileName),
+		},
+		{
+			Name:  legion.ModelTrainingName,
+			Value: modelBuilderCR.Name,
+		},
+		{
+			Name:  legion.ModelTrainingName,
+			Value: modelBuilderCR.Name,
+		},
+		{
+			Name: legion.ModelOutputDataBinding,
+			// TODO: remove hardcode
+			Value: "output-data",
+		},
+	}
+
+	return builderEnvSet, nil
+}
+
+func (r *ReconcileModelTraining) generateModelEnvs(modelBuilderCR *legionv1alpha1.ModelTraining, vcsInstance *legionv1alpha1.VCSCredential) ([]corev1.EnvVar, error) {
+	builderEnvSet := []corev1.EnvVar{
+		{
+			Name: legion.Namespace,
+			ValueFrom: &corev1.EnvVarSource{
+				FieldRef: &corev1.ObjectFieldSelector{
+					FieldPath: "metadata.namespace",
+				},
+			},
+		},
+		{
+			Name:  legion.MetricHost,
+			Value: viper.GetString(legion.MetricHost),
+		},
+		{
+			Name:  legion.MetricPort,
+			Value: viper.GetString(legion.MetricPort),
+		},
+		{
+			Name:  legion.MetricEnabled,
+			Value: viper.GetString(legion.MetricEnabled),
+		},
+		{
+			Name:  legion.ModelFile,
+			Value: modelBuilderCR.Spec.ModelFile,
+		},
+		{
+			Name:  legion.DockerRegistry,
+			Value: viper.GetString(legion.DockerRegistry),
+		},
+		{
+			Name:  legion.DockerRegistryUser,
+			Value: viper.GetString(legion.DockerRegistryUser),
+		},
+		{
+			Name:  legion.DockerRegistryPassword,
+			Value: viper.GetString(legion.DockerRegistryPassword),
+		},
+	}
+
+	toolchainIntegration := &legionv1alpha1.ToolchainIntegration{}
+	if err := r.Get(context.TODO(), types.NamespacedName{
+		Name:      modelBuilderCR.Spec.Toolchain,
+		Namespace: viper.GetString(legion.Namespace),
+	}, toolchainIntegration); err != nil {
+		log.Error(err, fmt.Sprintf("Retrieve %s toolchain", modelBuilderCR.Spec.Toolchain))
+		return nil, err
+	}
+
+	for _, env := range toolchainIntegration.Spec.AdditionalEnvironments {
+		builderEnvSet = append(builderEnvSet, env)
+	}
+
+	return builderEnvSet, nil
+}
 func (r *ReconcileModelTraining) generateModelBuildPod(modelBuilderCR *legionv1alpha1.ModelTraining) (pod *corev1.Pod, err error) {
 	vcsInstance, err := r.findVCSInstance(modelBuilderCR.Spec.VCSName, modelBuilderCR.Namespace)
 	if err != nil {
@@ -160,12 +267,12 @@ func (r *ReconcileModelTraining) generateModelBuildPod(modelBuilderCR *legionv1a
 
 	vcsSecretName := legion.GenerateVcsSecretName(vcsInstance.Name)
 
-	modelCommand, err := legion.GenerateModelCommand(
-		modelBuilderCR.Spec.WorkDir,
-		modelBuilderCR.Spec.ToolchainType,
-		modelBuilderCR.Spec.Entrypoint,
-		modelBuilderCR.Spec.EntrypointArguments,
-	)
+	builderEnvSet, err := r.generateBuilderEnvs(modelBuilderCR, vcsInstance)
+	if err != nil {
+		return nil, err
+	}
+
+	modelEnvSet, err := r.generateModelEnvs(modelBuilderCR, vcsInstance)
 	if err != nil {
 		return nil, err
 	}
@@ -176,6 +283,7 @@ func (r *ReconcileModelTraining) generateModelBuildPod(modelBuilderCR *legionv1a
 			Namespace: modelBuilderCR.Namespace,
 			Annotations: map[string]string{
 				"sidecar.istio.io/inject": "false",
+				"iam.amazonaws.com/role":  "legion-test.epm.kharlamov.biz-legion-collector-role",
 			},
 		},
 		Spec: corev1.PodSpec{
@@ -218,49 +326,12 @@ func (r *ReconcileModelTraining) generateModelBuildPod(modelBuilderCR *legionv1a
 			},
 			Containers: []corev1.Container{
 				{
-					Name:    modelContainerName,
-					Image:   modelBuilderCR.Spec.Image,
-					Command: []string{"/bin/tiny"},
-					Args:    []string{"--", "cat"},
-					Stdin:   true,
-					Env: []corev1.EnvVar{
-						{
-							Name: legion.Namespace,
-							ValueFrom: &corev1.EnvVarSource{
-								FieldRef: &corev1.ObjectFieldSelector{
-									FieldPath: "metadata.namespace",
-								},
-							},
-						},
-						{
-							Name:  legion.MetricHost,
-							Value: viper.GetString(legion.MetricHost),
-						},
-						{
-							Name:  legion.MetricPort,
-							Value: viper.GetString(legion.MetricPort),
-						},
-						{
-							Name:  legion.MetricEnabled,
-							Value: viper.GetString(legion.MetricEnabled),
-						},
-						{
-							Name:  legion.ModelFile,
-							Value: modelBuilderCR.Spec.ModelFile,
-						},
-						{
-							Name:  legion.DockerRegistry,
-							Value: viper.GetString(legion.DockerRegistry),
-						},
-						{
-							Name:  legion.DockerRegistryUser,
-							Value: viper.GetString(legion.DockerRegistryUser),
-						},
-						{
-							Name:  legion.DockerRegistryPassword,
-							Value: viper.GetString(legion.DockerRegistryPassword),
-						},
-					},
+					Name:      modelContainerName,
+					Image:     modelBuilderCR.Spec.Image,
+					Command:   []string{"/bin/tiny"},
+					Args:      []string{"--", "cat"},
+					Stdin:     true,
+					Env:       modelEnvSet,
 					Resources: *modelBuilderCR.Spec.Resources,
 					VolumeMounts: []corev1.VolumeMount{
 						{
@@ -274,66 +345,9 @@ func (r *ReconcileModelTraining) generateModelBuildPod(modelBuilderCR *legionv1a
 					},
 				},
 				{
-					Name:  builderContainerName,
-					Image: viper.GetString(legion.BuilderImage),
-					Env: []corev1.EnvVar{
-						{
-							Name: legion.PodName,
-							ValueFrom: &corev1.EnvVarSource{
-								FieldRef: &corev1.ObjectFieldSelector{
-									FieldPath: "metadata.name",
-								},
-							},
-						},
-						{
-							Name: legion.Namespace,
-							ValueFrom: &corev1.EnvVarSource{
-								FieldRef: &corev1.ObjectFieldSelector{
-									FieldPath: "metadata.namespace",
-								},
-							},
-						},
-						{
-							Name:  legion.RepositoryURL,
-							Value: vcsInstance.Spec.Uri,
-						},
-						{
-							Name:  legion.ImagePrefix,
-							Value: viper.GetString(legion.ImagePrefix),
-						},
-						{
-							Name:  legion.SharedDirPath,
-							Value: sharedDirPath,
-						},
-						{
-							Name:  legion.Reference,
-							Value: modelBuilderCR.Spec.Reference,
-						},
-						{
-							Name:  legion.ModelFile,
-							Value: modelBuilderCR.Spec.ModelFile,
-						},
-						{
-							Name:  legion.ModelCommand,
-							Value: modelCommand,
-						},
-						{
-							Name:  legion.DockerRegistry,
-							Value: viper.GetString(legion.DockerRegistry),
-						},
-						{
-							Name:  legion.DockerRegistryUser,
-							Value: viper.GetString(legion.DockerRegistryUser),
-						},
-						{
-							Name:  legion.DockerRegistryPassword,
-							Value: viper.GetString(legion.DockerRegistryPassword),
-						},
-						{
-							Name:  legion.GitSSHKeyPath,
-							Value: fmt.Sprintf("%s/%s", gitSecretPath, utils.GitSSHKeyFileName),
-						},
-					},
+					Name:      builderContainerName,
+					Image:     viper.GetString(legion.BuilderImage),
+					Env:       builderEnvSet,
 					Resources: builderResources,
 					VolumeMounts: []corev1.VolumeMount{
 						{
@@ -542,6 +556,8 @@ func (r *ReconcileModelTraining) Reconcile(request reconcile.Request) (reconcile
 		log.Error(err, "Cannot fetch CR status")
 		return reconcile.Result{}, err
 	}
+
+	_ = modelBuilderCrd.ValidatesAndSetDefaults(r)
 
 	if err := r.syncK8SInstances(modelBuilderCrd); err != nil {
 		log.Error(err, "Can not synchronize desired K8S instances state to cluster")

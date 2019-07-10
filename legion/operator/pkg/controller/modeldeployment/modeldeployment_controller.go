@@ -283,8 +283,8 @@ func (r *ReconcileModelDeployment) createModelContainer(modelDeploymentCR *legio
 	}
 
 	return corev1.Container{
-		Image:           modelDeploymentCR.Spec.Image,
-		Resources:       *modelDeploymentCR.Spec.Resources,
+		Image:     modelDeploymentCR.Spec.Image,
+		Resources: *modelDeploymentCR.Spec.Resources,
 		Ports: []corev1.ContainerPort{
 			{
 				Name:          defaultPortName,

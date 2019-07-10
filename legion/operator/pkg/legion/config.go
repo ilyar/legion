@@ -55,6 +55,9 @@ const (
 	PrometheusMetricsPort  = "PROMETHEUS_METRICS_PORT"
 	EdgeHost               = "EDGE_HOST"
 	FeedbackEnabled        = "FEEDBACK_ENABLED"
+	ModelTrainingName      = "MODEL_TRAINING_NAME"
+	ModelOutputDataBinding = "MODEL_OUTPUT_DATA_BINDING"
+	OutputTrainingDir      = "OUTPUT_TRAINING_DIR"
 )
 
 // TODO:
@@ -63,14 +66,13 @@ const (
 func SetUpBuilderConfig() {
 	setNotEmptyParam(RepositoryURL)
 	setNotEmptyParam(PodName)
-	setNotEmptyParam(DockerRegistry)
 	setNotEmptyParam(SharedDirPath)
 	setNotEmptyParam(Reference)
-	setNotEmptyParam(ImagePrefix)
 	setNotEmptyParam(Namespace)
 	setNotEmptyParam(GitSSHKeyPath)
-	setNotEmptyParam(ModelFile)
-	setNotEmptyParam(ModelCommand)
+	setNotEmptyParam(ModelTrainingName)
+	setNotEmptyParam(ModelOutputDataBinding)
+	setNotEmptyParam(OutputTrainingDir)
 }
 
 func SetUpOperatorConfig() {

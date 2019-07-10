@@ -46,9 +46,9 @@ func TestStorageModelTraining(t *testing.T) {
 			Namespace: testNamespace,
 		},
 		Spec: ModelTrainingSpec{
-			ToolchainType: mtToolchainType,
-			VCSName:       vcsTest.ObjectMeta.Name,
-			Image:         mtImage,
+			Toolchain: mtToolchainType,
+			VCSName:   vcsTest.ObjectMeta.Name,
+			Image:     mtImage,
 		},
 	}
 
@@ -78,8 +78,7 @@ func TestMTDefaultValues(t *testing.T) {
 	viper.SetDefault(legion.PythonToolchainImage, toolchainImage)
 	mt := &ModelTraining{
 		Spec: ModelTrainingSpec{
-			VCSName:       vcsTest.ObjectMeta.Name,
-			ToolchainType: legion.PythonToolchainName,
+			VCSName: vcsTest.ObjectMeta.Name,
 		},
 	}
 
@@ -110,7 +109,7 @@ func TestToolchainType(t *testing.T) {
 
 	mt := &ModelTraining{
 		Spec: ModelTrainingSpec{
-			ToolchainType: "not-exists",
+			Toolchain: "not-exists",
 		},
 	}
 

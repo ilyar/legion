@@ -21,11 +21,16 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+type DataBindingDir struct {
+	DataBindingName *string          `json:"name,omitempty"`
+	Dir             string           `json:"dir"`
+	DataBinding     *DataBindingSpec `json:"dataBinding,omitempty"`
+}
+
 // ModelTrainingSpec defines the desired state of ModelTraining
 type ModelTrainingSpec struct {
 	// Type of toolchain. Currently supports only python.
-	// +kubebuilder:validation:Enum=python,jupyter
-	ToolchainType string `json:"toolchain"`
+	Toolchain string `json:"toolchain"`
 	// Custom environment variables that should be setted before entrypoint invocation.
 	// In ENVname:value format
 	CustomEnvs map[string]string `json:"env,omitempty"`
@@ -47,6 +52,10 @@ type ModelTrainingSpec struct {
 	// Resources for model container
 	// The same format like k8s uses for pod resources.
 	Resources *corev1.ResourceRequirements `json:"resources,omitempty"`
+	// blablabla
+	Experiment string `json:"experiment"`
+	// blabla
+	Data []DataBindingDir `json:"data,omitempty"`
 }
 
 // ModelTrainingState defines current state

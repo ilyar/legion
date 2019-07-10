@@ -25,6 +25,46 @@ rules:
   - deployments/status
   verbs:
   - get
+  - update
+  - patch
+- apiGroups:
+  - legion.legion-platform.org
+  resources:
+  - databindings
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - legion.legion-platform.org
+  resources:
+  - databindings/status
+  verbs:
+  - get
+  - update
+  - patch
+- apiGroups:
+  - apps
+  resources:
+  - deployments
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - apps
+  resources:
+  - deployments/status
+  verbs:
+  - get
   - list
   - watch
   - create
@@ -193,6 +233,46 @@ rules:
   - events
   verbs:
   - create
+  - patch
+- apiGroups:
+  - apps
+  resources:
+  - deployments
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - apps
+  resources:
+  - deployments/status
+  verbs:
+  - get
+  - update
+  - patch
+- apiGroups:
+  - legion.legion-platform.org
+  resources:
+  - toolchainintegrations
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - legion.legion-platform.org
+  resources:
+  - toolchainintegrations/status
+  verbs:
+  - get
+  - update
   - patch
 - apiGroups:
   - ""

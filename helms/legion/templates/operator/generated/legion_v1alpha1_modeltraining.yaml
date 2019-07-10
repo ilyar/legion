@@ -56,6 +56,35 @@ spec:
               items:
                 type: string
               type: array
+            data:
+              description: blabla
+              items:
+                properties:
+                  dataBinding:
+                    properties:
+                      region:
+                        description: blabla
+                        type: string
+                      type:
+                        description: blabla
+                        enum:
+                        - s3
+                        type: string
+                      uri:
+                        description: blabla
+                        type: string
+                    required:
+                    - type
+                    - uri
+                    type: object
+                  dir:
+                    type: string
+                  name:
+                    type: string
+                required:
+                - dir
+                type: object
+              type: array
             entrypoint:
               description: Model training file. It can be python\bash script or jupiter
                 notebook
@@ -64,6 +93,9 @@ spec:
               description: Custom environment variables that should be setted before
                 entrypoint invocation. In ENVname:value format
               type: object
+            experiment:
+              description: blablabla
+              type: string
             hyperparameters:
               description: Model training hyperparameters in parameter:value format
               type: object
@@ -82,9 +114,6 @@ spec:
               type: object
             toolchain:
               description: Type of toolchain. Currently supports only python.
-              enum:
-              - python
-              - jupyter
               type: string
             vcsName:
               description: Name of VCSCredential resource. Must exists
@@ -96,6 +125,7 @@ spec:
           - toolchain
           - entrypoint
           - vcsName
+          - experiment
           type: object
         status:
           properties:

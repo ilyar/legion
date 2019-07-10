@@ -53,11 +53,11 @@ func TestGetMT(t *testing.T) {
 			Namespace: testNamespace,
 		},
 		Spec: legionv1alpha1.ModelTrainingSpec{
-			ToolchainType: mtToolchainType,
-			Entrypoint:    mtEntrypoint,
-			VCSName:       mtVCSName,
-			Image:         mtImage,
-			Reference:     mtReference,
+			Toolchain:  mtToolchainType,
+			Entrypoint: mtEntrypoint,
+			VCSName:    mtVCSName,
+			Image:      mtImage,
+			Reference:  mtReference,
 		},
 	}
 	g.Expect(c.Create(context.TODO(), mt)).NotTo(HaveOccurred())
@@ -222,11 +222,11 @@ func TestCreateMT(t *testing.T) {
 	mtEntity := &MTRequest{
 		Name: mtName,
 		Spec: legionv1alpha1.ModelTrainingSpec{
-			ToolchainType: mtToolchainType,
-			Entrypoint:    mtEntrypoint,
-			VCSName:       mtVCSName,
-			Image:         mtImage,
-			Reference:     mtReference,
+			Toolchain:  mtToolchainType,
+			Entrypoint: mtEntrypoint,
+			VCSName:    mtVCSName,
+			Image:      mtImage,
+			Reference:  mtReference,
 		},
 	}
 
@@ -265,11 +265,11 @@ func TestCreateDuplicateMT(t *testing.T) {
 	mtEntity := &MTRequest{
 		Name: mtName,
 		Spec: legionv1alpha1.ModelTrainingSpec{
-			ToolchainType: mtToolchainType,
-			Entrypoint:    mtEntrypoint,
-			VCSName:       mtVCSName,
-			Image:         mtImage,
-			Reference:     mtReference,
+			Toolchain:  mtToolchainType,
+			Entrypoint: mtEntrypoint,
+			VCSName:    mtVCSName,
+			Image:      mtImage,
+			Reference:  mtReference,
 		},
 	}
 
@@ -279,11 +279,11 @@ func TestCreateDuplicateMT(t *testing.T) {
 			Namespace: testNamespace,
 		},
 		Spec: legionv1alpha1.ModelTrainingSpec{
-			ToolchainType: mtToolchainType,
-			Entrypoint:    mtEntrypoint,
-			VCSName:       mtVCSName,
-			Image:         mtImage,
-			Reference:     mtReference,
+			Toolchain:  mtToolchainType,
+			Entrypoint: mtEntrypoint,
+			VCSName:    mtVCSName,
+			Image:      mtImage,
+			Reference:  mtReference,
 		},
 	}
 
@@ -316,11 +316,11 @@ func TestUpdateMT(t *testing.T) {
 			Namespace: testNamespace,
 		},
 		Spec: legionv1alpha1.ModelTrainingSpec{
-			ToolchainType: mtToolchainType,
-			Entrypoint:    mtEntrypoint,
-			VCSName:       mtVCSName,
-			Image:         mtImage,
-			Reference:     mtReference,
+			Toolchain:  mtToolchainType,
+			Entrypoint: mtEntrypoint,
+			VCSName:    mtVCSName,
+			Image:      mtImage,
+			Reference:  mtReference,
 		},
 	}
 	g.Expect(c.Create(context.TODO(), mt)).NotTo(HaveOccurred())
@@ -329,11 +329,11 @@ func TestUpdateMT(t *testing.T) {
 	mtEntity := &MTRequest{
 		Name: mtName,
 		Spec: legionv1alpha1.ModelTrainingSpec{
-			ToolchainType: "python",
-			Entrypoint:    mtEntrypoint + "123",
-			VCSName:       mtVCSName + "123",
-			Image:         mtImage + "123",
-			Reference:     mtReference + "123",
+			Toolchain:  "python",
+			Entrypoint: mtEntrypoint + "123",
+			VCSName:    mtVCSName + "123",
+			Image:      mtImage + "123",
+			Reference:  mtReference + "123",
 		},
 	}
 
@@ -364,11 +364,11 @@ func TestUpdateMTNotFound(t *testing.T) {
 	mtEntity := &MTRequest{
 		Name: mtName,
 		Spec: legionv1alpha1.ModelTrainingSpec{
-			ToolchainType: mtToolchainType,
-			Entrypoint:    mtEntrypoint,
-			VCSName:       mtVCSName,
-			Image:         mtImage,
-			Reference:     mtReference,
+			Toolchain:  mtToolchainType,
+			Entrypoint: mtEntrypoint,
+			VCSName:    mtVCSName,
+			Image:      mtImage,
+			Reference:  mtReference,
 		},
 	}
 
@@ -398,11 +398,11 @@ func TestDeleteMT(t *testing.T) {
 			Namespace: testNamespace,
 		},
 		Spec: legionv1alpha1.ModelTrainingSpec{
-			ToolchainType: mtToolchainType,
-			Entrypoint:    mtEntrypoint,
-			VCSName:       mtVCSName,
-			Image:         mtImage,
-			Reference:     mtReference,
+			Toolchain:  mtToolchainType,
+			Entrypoint: mtEntrypoint,
+			VCSName:    mtVCSName,
+			Image:      mtImage,
+			Reference:  mtReference,
 		},
 	}
 	g.Expect(c.Create(context.TODO(), mt)).NotTo(HaveOccurred())

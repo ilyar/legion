@@ -120,11 +120,11 @@ func TestBasicReconcile(t *testing.T) {
 			Namespace: namespace,
 		},
 		Spec: legionv1alpha1.ModelTrainingSpec{
-			ToolchainType: "python",
-			VCSName:       vcsName,
-			Entrypoint:    "some entrypoint",
-			Resources:     &defaultModelResources,
-			Image:         modelImage,
+			Toolchain:  "python",
+			VCSName:    vcsName,
+			Entrypoint: "some entrypoint",
+			Resources:  &defaultModelResources,
+			Image:      modelImage,
 		},
 	}
 

@@ -157,11 +157,11 @@ func createModelTrainings(g *GomegaWithT, c client.Client) []*legionv1alpha1.Mod
 			},
 		},
 		Spec: legionv1alpha1.ModelTrainingSpec{
-			ToolchainType: mtToolchainType,
-			Entrypoint:    mtEntrypoint,
-			VCSName:       mtVCSName,
-			Image:         mtImage,
-			Reference:     mtReference,
+			Toolchain:  mtToolchainType,
+			Entrypoint: mtEntrypoint,
+			VCSName:    mtVCSName,
+			Image:      mtImage,
+			Reference:  mtReference,
 		},
 	}
 	g.Expect(c.Create(context.TODO(), md1)).NotTo(HaveOccurred())
@@ -176,11 +176,11 @@ func createModelTrainings(g *GomegaWithT, c client.Client) []*legionv1alpha1.Mod
 			},
 		},
 		Spec: legionv1alpha1.ModelTrainingSpec{
-			ToolchainType: mtToolchainType,
-			Entrypoint:    mtEntrypoint,
-			VCSName:       mtVCSName,
-			Image:         mtImage,
-			Reference:     mtReference,
+			Toolchain:  mtToolchainType,
+			Entrypoint: mtEntrypoint,
+			VCSName:    mtVCSName,
+			Image:      mtImage,
+			Reference:  mtReference,
 		},
 	}
 	g.Expect(c.Create(context.TODO(), md2)).NotTo(HaveOccurred())

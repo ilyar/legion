@@ -1172,6 +1172,38 @@ var doc = `{
                 }
             }
         },
+        "v1alpha1.DataBindingDir": {
+            "type": "object",
+            "properties": {
+                "dataBinding": {
+                    "type": "object",
+                    "$ref": "#/definitions/v1alpha1.DataBindingSpec"
+                },
+                "dir": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "v1alpha1.DataBindingSpec": {
+            "type": "object",
+            "properties": {
+                "region": {
+                    "description": "blabla",
+                    "type": "string"
+                },
+                "type": {
+                    "description": "blabla\n+kubebuilder:validation:Enum=s3",
+                    "type": "string"
+                },
+                "uri": {
+                    "description": "blabla",
+                    "type": "string"
+                }
+            }
+        },
         "v1alpha1.ModelDeploymentSpec": {
             "type": "object",
             "properties": {
@@ -1297,6 +1329,13 @@ var doc = `{
                         "type": "string"
                     }
                 },
+                "data": {
+                    "description": "blabla",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/v1alpha1.DataBindingDir"
+                    }
+                },
                 "entrypoint": {
                     "description": "Model training file. It can be python\\bash script or jupiter notebook",
                     "type": "string"
@@ -1304,6 +1343,10 @@ var doc = `{
                 "env": {
                     "description": "Custom environment variables that should be setted before entrypoint invocation.\nIn ENVname:value format",
                     "type": "object"
+                },
+                "experiment": {
+                    "description": "blablabla",
+                    "type": "string"
                 },
                 "hyperparameters": {
                     "description": "Model training hyperparameters in parameter:value format",
@@ -1326,7 +1369,7 @@ var doc = `{
                     "type": "string"
                 },
                 "toolchain": {
-                    "description": "Type of toolchain. Currently supports only python.\n+kubebuilder:validation:Enum=python,jupyter",
+                    "description": "Type of toolchain. Currently supports only python.",
                     "type": "string"
                 },
                 "vcsName": {

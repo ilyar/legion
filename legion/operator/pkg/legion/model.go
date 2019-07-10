@@ -34,11 +34,13 @@ type Model struct {
 }
 
 const (
-	ManifestFile    = "manifest.json"
-	ModelImageKey   = "model-image"
-	ModelNameKey    = "model-name"
-	ModelVersionKey = "model-version"
-	ModelCommitID   = "model-commit-id"
+	ManifestFile              = "manifest.json"
+	ModelImageKey             = "model-image"
+	ModelNameKey              = "model-name"
+	ModelVersionKey           = "model-version"
+	ModelCommitID             = "model-commit-id"
+	TrainingOutputZip         = "training-output-zip"
+	TrainingOutputDataBinding = "training-output-databinding"
 )
 
 var (
